@@ -1,17 +1,15 @@
 // import PriceFeed from './Components/PriceFeed'
 import Login from "./Components/Login";
-import Logout from "./Components/Logout";
+import "./Style/Style.css";
 
 function App() {
-
   return (
     <div className="main">
       {/* Account Login */}
-      <div className="sub">
-        <Login />
-      </div>
-      <div className="sub">
-        <Logout />
+      <div className="auth">
+        <div className="sub">
+          <Login />
+        </div>
       </div>
       {/* Price Feed */}
       <div className="sub">

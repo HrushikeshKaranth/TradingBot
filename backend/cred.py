@@ -1,0 +1,6 @@
+user    = 'FA196478'
+pwd     = 'Hrushi@476'
+factor2 = 'TPY6T3M3F536E7C4757IL466424J53E5'
+vc      = 'FA196478_U'
+app_key = 'a300b91f2114e5fcb87b9436f1376c27'
+imei    = 'abc1234'

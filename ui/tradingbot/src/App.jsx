@@ -1,5 +1,6 @@
-// import Login from './Components/Login'
 // import PriceFeed from './Components/PriceFeed'
+import Login from "./Components/Login";
+import Logout from "./Components/Logout";
 
 function App() {
 
@@ -7,7 +8,10 @@ function App() {
     <div className="main">
       {/* Account Login */}
       <div className="sub">
-        
+        <Login />
+      </div>
+      <div className="sub">
+        <Logout />
       </div>
       {/* Price Feed */}
       <div className="sub">

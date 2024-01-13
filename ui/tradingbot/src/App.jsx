@@ -1,5 +1,5 @@
-// import PriceFeed from './Components/PriceFeed'
 import Login from "./Components/Login";
+import PriceFeed from './Components/PriceFeed'
 import "./Style/Style.css";
 
 function App() {
@@ -12,26 +12,14 @@ function App() {
         </div>
       </div>
       {/* Price Feed */}
-      <div className="sub">
+      <div className="feed">
         {/* Nifty 50 Price */}
-        <div className="sub1">
-
-        </div>
-        {/* Nifty Bank Price */}
-        <div className="sub1">
-
-        </div>
-        {/* Nifty Fin Price */}
-        <div className="sub1">
-
-        </div>
-        {/* Nifty Midcap Price */}
-        <div className="sub1">
-
+        <div className="sub">
+          <PriceFeed />
         </div>
       </div>
       {/* Strategy section */}
-      <div className="sub">
+      <div className="strat">
 
       </div>
     </div>

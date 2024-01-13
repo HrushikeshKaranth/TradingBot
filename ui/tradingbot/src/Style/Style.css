@@ -13,7 +13,7 @@
     flex-direction: column;
     border: 5px solid black;
 }
-.auth{
+.auth, .feed{
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -21,12 +21,21 @@
     gap: 5px;
     padding: 5px;
 }
-.auth > .sub{
+.sub_
+{
     width: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
-    /* justify-content: center; */
+    border: 3px solid blue;
+    gap: 5px;
+    padding: 5px;
+}
+.sub{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     border: 3px solid blue;
     gap: 5px;
     padding: 5px;

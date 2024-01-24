@@ -10,7 +10,10 @@ export default function Login() {
   useEffect(()=>{
     localStorage.getItem("username")?setIsLogged(true):setIsLogged(false);
     localStorage.getItem("username")?setMsg(""):setMsg("Logged out! 🙂 ");
-
+    return ()=>{
+      localStorage.removeItem("username");
+      localStorage.removeItem("userToken");
+    }
   },[])
 
   function login() {
@@ -56,11 +59,11 @@ export default function Login() {
 
   return (
     <>
-      {isLogged?<></>:<button onClick={login}>Login</button>}
+      <button onClick={login}>Login</button>
       <div className='msg'>
         {msg}{     }{username}
       </div>
-      {isLogged?<button onClick={logout}>Logout</button>:<></>}
+      <button onClick={logout}>Logout</button>
     </>
   )
 }

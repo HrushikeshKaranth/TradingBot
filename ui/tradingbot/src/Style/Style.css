@@ -34,7 +34,7 @@
 .sub{
     width: 100%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     border: 3px solid blue;
     gap: 5px;

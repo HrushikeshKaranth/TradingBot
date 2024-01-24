@@ -3,6 +3,7 @@ from flask import request, jsonify
 from api_helper import ShoonyaApiPy
 import logging
 import pyotp
+import pandas as pd
 
 
 def login():
@@ -62,4 +63,36 @@ def pricefeedmidcap():
     # ret = api.get_quotes(exchange='NSE', token='26000')
     ret = api.get_quotes(exchange='NSE', token='26074')
     print(ret['lp'])
+    return jsonify(ret)
+
+def placeorder():
+    def getSymbol(txt):
+        res = api.searchscrip('NFO',txt)
+        resDf = pd.DataFrame(res['values'])
+        # print(res.sort_values(by='weekely').iloc[0])
+        return resDf.sort_values(by='weekly').iloc[0]
+
+    res = request.get_json()
+    tradingSymbol = res['symbol']
+    # month = 'JAN'
+    atmstrike = '21450'
+    expiry = '25JAN24'
+    ce = f'NIFTY{expiry}C{atmstrike}'
+    pe = f'NIFTY{expiry}P{atmstrike}'
+    # cesymbolinfo = getSymbol(f'NIFTY {month} {atmstrike} CE')
+    # pesymbolinfo = getSymbol(f'NIFTY {month} {atmstrike} PE')
+    # ce = cesymbolinfo['tsym']
+
+    # cesymbolinfo = getSymbol(f'BANKNIFTY {month} {atmstrike} CE')
+
+    remarks = res['remarks']
+    ret = api.place_order(buy_or_sell='S', product_type='M',
+                        exchange='NFO', tradingsymbol=ce, 
+                        quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks=remarks)
+    ret = api.place_order(buy_or_sell='S', product_type='M',
+                        exchange='NFO', tradingsymbol=pe, 
+                        quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks=remarks)
+    print(res['symbol'])
     return jsonify(ret)

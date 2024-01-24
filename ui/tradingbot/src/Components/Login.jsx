@@ -32,8 +32,8 @@ export default function Login() {
       })
       .catch((err) => {
         console.log("Couldn't Login 😥");
-        console.log(err);
-        setMsg("Couldn't Login 😥");
+        console.log(err.message);
+        setMsg("Couldn't Login! - " + err.message + " 😥");
       })
   }
 

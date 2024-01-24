@@ -1,8 +1,15 @@
+import { useEffect } from "react";
 import Login from "./Components/Login";
 import PriceFeed from './Components/PriceFeed'
 import "./Style/Style.css";
 
 function App() {
+  useEffect(()=>{
+    return ()=>{
+      localStorage.removeItem("username");
+      localStorage.removeItem("userToken");
+    }
+  })
   return (
     <div className="main">
       {/* Account Login */}

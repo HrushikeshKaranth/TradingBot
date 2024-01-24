@@ -1,12 +1,13 @@
-# from app import app, api
-# from flask import request, jsonify
-from api_helper import ShoonyaApiPy
-# import logging
-# import pyotp
-# import yaml
-from NorenApi import NorenApi
-import config
+# option strike getter
 
-shoonya=NorenApi()
-ret = shoonya.login(config.user, config.pwd, config.factor2, config.vc, config.app_key, config.imei)
-print(ret)
+def getSymbol(txt):
+    res = api.serachscrip('NFO',txt)
+    resDf = pd.Dataframe(res['values'])
+    return res.sort_values(by='weekely').iloc[0]
+
+month = 'FEB'
+atmstrike = '21300'
+cesymbolinfo = getSymbol(f'NIFTY {month} {atmstrike} CE')
+ce = cesymbolinfo['tsym']
+
+cesymbolinfo = getSymbol(f'BANKNIFTY {month} {atmstrike} CE')

@@ -11,27 +11,72 @@ export default function PriceFeed() {
   let [niftyFinStrike, setNiftyFinStrike] = useState('')
   let [midcap, setMidcap] = useState('')
   let [midcapStrike, setMidcapStrike] = useState('')
-  let [orderDetails, setOrderDetails] = useState({'symbol':'CRUDEOILM16FEB24', 'remarks':'my_order_001'})
-  let feed = null;
+  let [expiry, setExpiry] = useState('')
+  let [index, setIndex] = useState('')
+  let [feed, setFeed] = useState(null)
+  let [orderNum, setOrderNum] = useState({})
+  let [entryStrike, setEntryStrike] = useState()
+  let [straddle, setStraddle] = useState(null)
+  // let [atmStrike, setAtmStrike] = useState('')
+  // let feed = 0;
+  // let [orderDetails, setOrderDetails] = useState({'ce':index+expiry+'P'+niftyStrike, 'pe':index+expiry+'C'+niftyStrike})
+  console.log(index + expiry + 'P' + niftyStrike);
+  console.log(index + expiry + 'C' + niftyStrike);
+  // console.log(orderNum);
 
-  useEffect(()=>{
-    return ()=>{
-      localStorage.removeItem("username");
-      localStorage.removeItem("userToken");
+  function straddleCheck() {
+    if (entryStrike != niftyStrike) {
+      console.log('Straddle is bad, Adjusting the strike.');
+      stopStraddle();
+      exitOrder();
     }
-  })
-
-  function startFeed() {
-    localStorage.getItem("username") ?
-      feed = setInterval(() => {
-        PriceFeed();
-      }, 1000)
-      : alert('Login for price feed! 🥱');
+    else {
+      console.log('Straddle is good!');
+    }
   }
 
+  function startStraddle() {
+    setStraddle(setInterval(straddleCheck, 1000));
+    console.log('Straddle started!');
+  }
+  function stopStraddle() {
+    setStraddle(clearInterval(straddle))
+    console.log('Straddle stopped ❌');
+  }
+
+  function startFeed() {
+    // clearInterval(feed);
+    setFeed(setInterval(pricestream, 1000));
+    // feed = setInterval(PriceFeed, 1000);
+  }
   function stopFeed() {
-    clearInterval(feed);
-    feed = null;
+    // clearInterval(feed);
+    setFeed(clearInterval(feed))
+    console.log('Price Feed Stopped ❌');
+    // setFeed(0)
+    // feed = 0;
+  }
+
+  function pricestream(){
+    axios.get('/pricestream')
+      .then((res) => {
+        // console.log(res);
+
+        setNiftyStrike(Math.round(res.data[0] / 50) * 50)
+        setNifty(res.data[0])
+
+        setNiftyBankStrike(Math.round(res.data[1] / 100) * 100)
+        setNiftyBank(res.data[1])
+
+        setNiftyFinStrike(Math.round(res.data[2] / 50) * 50)
+        setNiftyFin(res.data[2])
+
+        setMidcapStrike(Math.round(res.data[3] / 25) * 25)
+        setMidcap(res.data[3])
+      })
+      .catch((err) => {
+        console.log(err);
+      })
   }
 
   function PriceFeed() {
@@ -76,23 +121,102 @@ export default function PriceFeed() {
       })
   }
 
-  function placeOrder(){
-    axios.post('/placeorder', orderDetails)
-    .then((res)=>{
-      console.log('order placed!');
-      console.log(res);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
+  function placeOrder() {
+    setEntryStrike(niftyStrike)
+    axios.post('/placeorder', { 'ce': index + expiry + 'P' + entryStrike, 'pe': index + expiry + 'C' + entryStrike })
+      .then((res) => {
+        console.log(res);
+        if (res.data[0].stat && res.data[1].stat == 'Ok') {
+          startStraddle();
+          console.log('order placed!');
+          setOrderNum({ 'ord1': res.data[0].norenordno, 'ord2': res.data[0].norenordno })
+        }
+        else {
+          alert('Order placing error❗❌')
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  }
+
+  function exitOrder() {
+    axios.post('/exitorder', { 'ce': index + expiry + 'P' + entryStrike, 'pe': index + expiry + 'C' + entryStrike })
+      .then((res) => {
+        console.log(res);
+        if (res.data[0].stat && res.data[1].stat == 'Ok') {
+          console.log('order exited!');
+          setOrderNum({ 'ord1': res.data[0].norenordno, 'ord2': res.data[0].norenordno })
+          placeOrder();
+        }
+        else {
+          alert('order exiting error❗❌');
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+    // // let data = {'ord1': orderNum.ord1, 'ord2': orderNum.ord2}
+    // axios.post('/exitorder', {'ord1': orderNum.ord1, 'ord2': orderNum.ord2})
+    // .then((res)=>{
+    //   console.log(res);
+    //   if (res.data[0].stat && res.data[1].stat == 'Ok') {
+    //     console.log('order exited!');
+    //     // setOrderNum({'ord1':res.data[0].norenordno, 'ord2':res.data[0].norenordno})
+    //   }
+    //   else{
+    //     alert('Order exiting error❗❌')
+    //   }
+    // })
+    // .catch((err)=>{
+    //   console.log(err);
+    // })
+  }
+
+  function closeOrder() {
+    axios.post('/exitorder', { 'ce': index + expiry + 'P' + entryStrike, 'pe': index + expiry + 'C' + entryStrike })
+      .then((res) => {
+        console.log(res);
+        if (res.data[0].stat && res.data[1].stat == 'Ok') {
+          console.log('order exited!');
+          setOrderNum({ 'ord1': res.data[0].norenordno, 'ord2': res.data[0].norenordno })
+          stopStraddle();
+          stopFeed();
+        }
+        else {
+          alert('order exiting error❗❌');
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
   }
 
   return (
 
-    <div className='sub__'>
+    <div className='priceFeedSec'>
+      <div className="sub_">
+      <div className="priceFeedSettings">
+          <button onClick={startFeed}>Start Feed</button>
+          <button onClick={stopFeed}>Stop Feed</button>
+          <select name="Select Index" onChange={(e) => { setIndex(e.target.value) }}>
+            <option name="Select Index" selected disabled hidden >Index</option>
+            <option value="NIFTY">Nifty 50</option>
+            <option value="BANKNIFTY">Bank Nifty</option>
+            <option value="FINNIFTY">Fin Nifty</option>
+            <option value="MIDCPNIFTY">Midcap Nifty</option>
+          </select>
+          <select name='expiry' onChange={(e) => { setExpiry(e.target.value) }}>
+            <option name="Select Expiry" selected disabled hidden >Expiry</option>
+            <option value="25JAN24">25 Jan 2024</option>
+            <option value="01FEB24">01 Feb 2024</option>
+            <option value="08FEB24">08 Feb 2024</option>
+            <option value="15FEB24">15 Feb 2024</option>
+            <option value="22FEB24">22 Feb 2024</option>
+          </select>
+        </div>
+      </div>
       <div className='sub_'>
-        <button onClick={startFeed}>Start Feed</button>
-        <button onClick={stopFeed}>Stop Feed</button>
         <div className="sub">
           <span>Nifty: {nifty}</span>
           <span>Strike: {niftyStrike}</span>
@@ -111,7 +235,11 @@ export default function PriceFeed() {
         </div>
       </div>
       <div className="sub_">
-        <button onClick={placeOrder}>Execute</button>
+        <button onClick={placeOrder}>Place</button>
+        <button onClick={exitOrder}>Exit</button>
+        <button onClick={closeOrder}>Close</button>
+        <button onClick={startStraddle}>Start Straddle</button>
+        <button onClick={stopStraddle}>Stop Straddle</button>
       </div>
       <div className="sub_">
         <span>options data</span>

@@ -14,9 +14,9 @@ function App() {
     <div className="main">
       {/* Account Login */}
       <div className="auth">
-        <div className="sub">
+        {/* <div className="sub"> */}
           <Login />
-        </div>
+        {/* </div> */}
       </div>
       {/* Price Feed */}
       <div className="feed">

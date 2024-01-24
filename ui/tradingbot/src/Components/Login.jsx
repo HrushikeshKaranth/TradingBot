@@ -8,8 +8,8 @@ export default function Login() {
   let [isLogged, setIsLogged] = useState(false);
 
   useEffect(()=>{
-    localStorage.getItem("username")?setIsLogged(true):setIsLogged(false);
-    localStorage.getItem("username")?setMsg(""):setMsg("Logged out! 🙂 ");
+    // localStorage.getItem("username")?setIsLogged(true):setIsLogged(false);
+    // localStorage.getItem("username")?setMsg(""):setMsg("Logged out! 🙂 ");
     return ()=>{
       localStorage.removeItem("username");
       localStorage.removeItem("userToken");
@@ -26,7 +26,7 @@ export default function Login() {
           localStorage.setItem("userToken", res.data.susertoken)
           setMsg("");
           console.log("Login Successfull! 🙂");
-          setIsLogged(true);
+          // setIsLogged(true);
         }
         else setMsg("");
       })
@@ -43,11 +43,12 @@ export default function Login() {
         console.log(res);
         if(res.status == 200){
           localStorage.removeItem("userToken");
+          localStorage.removeItem("username");
           localStorage.clear()
-          console.log("Logout Successfull! 🙂");
+          console.log("Logout Successful! 🙂");
           setMsg("Logged out! 🙂 ");
           setUsername(" ");
-          setIsLogged(false);
+          // setIsLogged(false);
         }
 
       })
@@ -58,12 +59,12 @@ export default function Login() {
   }
 
   return (
-    <>
+    <div className='loginSec'>
       <button onClick={login}>Login</button>
       <div className='msg'>
         {msg}{     }{username}
       </div>
       <button onClick={logout}>Logout</button>
-    </>
+    </div>
   )
 }

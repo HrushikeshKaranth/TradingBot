@@ -19,14 +19,14 @@ export default function PriceFeed() {
   const [straddle, setStraddle] = useState(null)
   let [check, setCheck] = useState(0)
   let count = null
-  // let [atmStrike, setAtmStrike] = useState('')
+  let [orderCount, setOrderCount] = useState(0)
   // let feed = 0;
   // let [orderDetails, setOrderDetails] = useState({'ce':index+expiry+'P'+niftyStrike, 'pe':index+expiry+'C'+niftyStrike})
   // console.log(index + expiry + 'P' + niftyStrike);
   // console.log(index + expiry + 'C' + niftyStrike);
   // console.log(entryStrike);
   // console.log(niftyStrike);
-  // console.log(check);
+  // console.log(orderCount);
 
   useEffect(()=>{
     entryStrike != niftyStrike ? exitOrder(): console.log('Straddle is good!');
@@ -44,7 +44,7 @@ export default function PriceFeed() {
   function startStraddle() {
     // count = setInterval(straddleCheck, 1000)
     setStraddle(setInterval(straddleCheck, 1000));
-    console.log('Straddle started!');
+    console.log('Straddle started ✔');
   }
   function stopStraddle() {
     setStraddle(clearInterval(straddle))
@@ -139,6 +139,7 @@ export default function PriceFeed() {
       if (res.data[0].stat && res.data[1].stat == 'Ok') {
           startStraddle();
           console.log('New order placed at - '+ niftyStrike);
+          console.log('Order Count = '+ orderCount);
           // console.log(niftyStrike);
           // console.log(entryStrike);
           // setOrderNum({ 'ord1': res.data[0].norenordno, 'ord2': res.data[0].norenordno })
@@ -163,6 +164,7 @@ export default function PriceFeed() {
           // setOrderNum({ 'ord1': res.data[0].norenordno, 'ord2': res.data[0].norenordno })
           console.log('Re-entering new strike!');
           placeOrder();
+          setOrderCount(orderCount = orderCount + 2)
         }
         else {
           alert('order exiting error❗❌');

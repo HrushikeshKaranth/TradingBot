@@ -138,9 +138,9 @@ export default function PriceFeed() {
       // console.log(res);
       if (res.data[0].stat && res.data[1].stat == 'Ok') {
           startStraddle();
-          console.log('New order placed at - '+ entryStrike);
+          console.log('New order placed at - '+ niftyStrike);
           // console.log(niftyStrike);
-          console.log(entryStrike);
+          // console.log(entryStrike);
           // setOrderNum({ 'ord1': res.data[0].norenordno, 'ord2': res.data[0].norenordno })
         }
         else {
@@ -196,7 +196,7 @@ export default function PriceFeed() {
           console.log('order exited!');
           setOrderNum({ 'ord1': res.data[0].norenordno, 'ord2': res.data[0].norenordno })
           stopStraddle();
-          stopFeed();
+          // stopFeed();
         }
         else {
           alert('order exiting error❗❌');

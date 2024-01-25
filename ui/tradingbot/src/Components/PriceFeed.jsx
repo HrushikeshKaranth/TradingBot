@@ -13,34 +13,42 @@ export default function PriceFeed() {
   let [midcapStrike, setMidcapStrike] = useState('')
   let [expiry, setExpiry] = useState('')
   let [index, setIndex] = useState('')
-  let [feed, setFeed] = useState(null)
+  const [feed, setFeed] = useState(null)
   let [orderNum, setOrderNum] = useState({})
-  let [entryStrike, setEntryStrike] = useState()
-  let [straddle, setStraddle] = useState(null)
+  let [entryStrike, setEntryStrike] = useState('')
+  const [straddle, setStraddle] = useState(null)
+  let [check, setCheck] = useState(0)
+  let count = null
   // let [atmStrike, setAtmStrike] = useState('')
   // let feed = 0;
   // let [orderDetails, setOrderDetails] = useState({'ce':index+expiry+'P'+niftyStrike, 'pe':index+expiry+'C'+niftyStrike})
-  console.log(index + expiry + 'P' + niftyStrike);
-  console.log(index + expiry + 'C' + niftyStrike);
-  // console.log(orderNum);
+  // console.log(index + expiry + 'P' + niftyStrike);
+  // console.log(index + expiry + 'C' + niftyStrike);
+  // console.log(entryStrike);
+  // console.log(niftyStrike);
+  // console.log(check);
+
+  useEffect(()=>{
+    entryStrike != niftyStrike ? exitOrder(): console.log('Straddle is good!');
+    // console.log(nifty);
+    // return ()=>{
+    //   setStraddle(clearInterval(straddle))
+    //   setFeed(clearInterval(feed))
+    // }
+  },[check])
 
   function straddleCheck() {
-    if (entryStrike != niftyStrike) {
-      console.log('Straddle is bad, Adjusting the strike.');
-      stopStraddle();
-      exitOrder();
-    }
-    else {
-      console.log('Straddle is good!');
-    }
+    setCheck(check = check+1)
   }
 
   function startStraddle() {
+    // count = setInterval(straddleCheck, 1000)
     setStraddle(setInterval(straddleCheck, 1000));
     console.log('Straddle started!');
   }
   function stopStraddle() {
     setStraddle(clearInterval(straddle))
+    // clearInterval(count);
     console.log('Straddle stopped ❌');
   }
 
@@ -62,6 +70,7 @@ export default function PriceFeed() {
       .then((res) => {
         // console.log(res);
 
+        // setEntryStrike(Math.round(res.data[0] / 50) * 50)
         setNiftyStrike(Math.round(res.data[0] / 50) * 50)
         setNifty(res.data[0])
 
@@ -122,14 +131,17 @@ export default function PriceFeed() {
   }
 
   function placeOrder() {
+    console.log('Entering strike - '+ niftyStrike);
     setEntryStrike(niftyStrike)
-    axios.post('/placeorder', { 'ce': index + expiry + 'P' + entryStrike, 'pe': index + expiry + 'C' + entryStrike })
-      .then((res) => {
-        console.log(res);
-        if (res.data[0].stat && res.data[1].stat == 'Ok') {
+    axios.post('/placeorder', { 'ce': index + expiry + 'P' + niftyStrike, 'pe': index + expiry + 'C' + niftyStrike })
+    .then((res) => {
+      // console.log(res);
+      if (res.data[0].stat && res.data[1].stat == 'Ok') {
           startStraddle();
-          console.log('order placed!');
-          setOrderNum({ 'ord1': res.data[0].norenordno, 'ord2': res.data[0].norenordno })
+          console.log('New order placed at - '+ entryStrike);
+          // console.log(niftyStrike);
+          console.log(entryStrike);
+          // setOrderNum({ 'ord1': res.data[0].norenordno, 'ord2': res.data[0].norenordno })
         }
         else {
           alert('Order placing error❗❌')
@@ -141,12 +153,15 @@ export default function PriceFeed() {
   }
 
   function exitOrder() {
+    stopStraddle();
+    console.log('Exiting strike - '+ entryStrike);
     axios.post('/exitorder', { 'ce': index + expiry + 'P' + entryStrike, 'pe': index + expiry + 'C' + entryStrike })
       .then((res) => {
         console.log(res);
         if (res.data[0].stat && res.data[1].stat == 'Ok') {
           console.log('order exited!');
-          setOrderNum({ 'ord1': res.data[0].norenordno, 'ord2': res.data[0].norenordno })
+          // setOrderNum({ 'ord1': res.data[0].norenordno, 'ord2': res.data[0].norenordno })
+          console.log('Re-entering new strike!');
           placeOrder();
         }
         else {

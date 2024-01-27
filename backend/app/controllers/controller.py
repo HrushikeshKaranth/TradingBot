@@ -25,8 +25,7 @@ def login():
 
     # make the api call
     otp = pyotp.TOTP(factor2).now()
-    ret = api.login(userid=user, password=pwd, twoFA=otp,
-                    vendor_code=vc, api_secret=apikey, imei=imei)
+    ret = api.login(userid=user, password=pwd, twoFA=otp, vendor_code=vc, api_secret=apikey, imei=imei)
 
     # print(ret)
     # ret = api.get_security_info(exchange='NSE', token='26000')
@@ -34,6 +33,13 @@ def login():
     print('Logged in - '+ret['uname'])
     return jsonify(ret)
 
+def setsession():
+    res = request.get_json()
+    user    = 'FA196478'
+    pwd     = 'Hrushi@476'
+    token = res['usertoken']
+    ret = api.set_session(userid=user, password=pwd, usertoken=token)
+    return jsonify(ret)
 
 def logout():
     ret = api.logout()

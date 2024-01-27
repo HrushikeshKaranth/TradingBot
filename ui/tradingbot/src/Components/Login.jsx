@@ -7,34 +7,50 @@ export default function Login() {
   let [username, setUsername] = useState(localStorage.getItem("username"));
   let [isLogged, setIsLogged] = useState(false);
 
-  useEffect(()=>{
-    // localStorage.getItem("username")?setIsLogged(true):setIsLogged(false);
-    // localStorage.getItem("username")?setMsg(""):setMsg("Logged out! 🙂 ");
-    return ()=>{
-      localStorage.removeItem("username");
-      localStorage.removeItem("userToken");
-    }
-  },[])
+  // useEffect(()=>{
+  //   localStorage.getItem("username")?setIsLogged(true):setIsLogged(false);
+  //   localStorage.getItem("username")?setMsg(""):setMsg("Logged out! 🙂 ");
+  //   return ()=>{
+  //     localStorage.removeItem("username");
+  //     localStorage.removeItem("userToken");
+  //   }
+  // },[])
 
   function login() {
-    axios.get(`/login`)
+    if(localStorage.getItem("userToken")){
+      axios.post('/setsession', {"usertoken":localStorage.getItem("userToken")})
       .then((res) => {
-        console.log(res);
-        if(res.status == 200){
-          setUsername(res.data.uname)
-          localStorage.setItem("username", res.data.uname)
-          localStorage.setItem("userToken", res.data.susertoken)
-          setMsg("");
-          console.log("Login Successfull! 🙂");
-          // setIsLogged(true);
+        if(res.status === 200){
+          console.log(res);
+          console.log('session restarted');
         }
-        else setMsg("");
+        else console.log('Error loggging in!');
       })
-      .catch((err) => {
-        console.log("Couldn't Login 😥");
-        console.log(err.message);
-        setMsg("Couldn't Login! - " + err.message + " 😥");
+      .catch((err)=>{
+        console.log(err);
+        console.log('Error loggging in!');
       })
+    }
+    else{
+      axios.get(`/login`)
+        .then((res) => {
+          console.log(res);
+          if(res.status == 200){
+            setUsername(res.data.uname)
+            localStorage.setItem("username", res.data.uname)
+            localStorage.setItem("userToken", res.data.susertoken)
+            setMsg("");
+            console.log("Login Successfull! 🙂");
+            // setIsLogged(true);
+          }
+          else setMsg("");
+        })
+        .catch((err) => {
+          console.log("Couldn't Login 😥");
+          console.log(err.message);
+          setMsg("Couldn't Login! - " + err.message + " 😥");
+        })
+    }
   }
 
   function logout() {

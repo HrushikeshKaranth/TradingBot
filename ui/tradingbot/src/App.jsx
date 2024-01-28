@@ -3,6 +3,7 @@ import Login from "./Components/Login";
 import PriceFeed from './Components/PriceFeed'
 import "./Style/Style.css";
 import axios from './Helpers/Axios'
+import Scalping from "./Components/Scalping";
 
 function App() {
   useEffect(()=>{
@@ -44,7 +45,7 @@ function App() {
       </div>
       {/* Strategy section */}
       <div className="strat">
-
+        <Scalping/>
       </div>
     </div>
   );

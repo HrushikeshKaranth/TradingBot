@@ -1,5 +1,5 @@
 from flask import Blueprint
-from app.controllers.controller import login, logout, pricefeednifty, pricefeedmidcap, pricefeedfinnifty, pricefeedbanknifty, placeorder, exitorder, pricestream,setsession
+from app.controllers.controller import login, logout, pricefeednifty, pricefeedmidcap, pricefeedfinnifty, pricefeedbanknifty, placeorder, exitorder, pricestream,setsession,placescalporder,placescalporderlong,placescalpordershort
 
 # Creating routes Blueprint
 routes = Blueprint('routes', __name__)
@@ -16,3 +16,6 @@ routes.route('/pricefeedmidcap', methods=['GET'])(pricefeedmidcap)
 routes.route('/pricestream', methods=['GET'])(pricestream)
 routes.route('/placeorder', methods=['POST'])(placeorder)
 routes.route('/exitorder', methods=['POST'])(exitorder)
+routes.route('/placescalporder', methods=['POST'])(placescalporder)
+routes.route('/placescalporderlong', methods=['POST'])(placescalporderlong)
+routes.route('/placescalpordershort', methods=['POST'])(placescalpordershort)

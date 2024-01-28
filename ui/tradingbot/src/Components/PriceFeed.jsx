@@ -20,25 +20,16 @@ export default function PriceFeed() {
   let [check, setCheck] = useState(0)
   let count = null
   let [orderCount, setOrderCount] = useState(0)
-  // let feed = 0;
-  // let [orderDetails, setOrderDetails] = useState({'ce':index+expiry+'P'+niftyStrike, 'pe':index+expiry+'C'+niftyStrike})
-  // console.log(index + expiry + 'P' + niftyStrike);
-  // console.log(index + expiry + 'C' + niftyStrike);
-  // console.log(entryStrike);
-  // console.log(niftyStrike);
-  // console.log(orderCount);
+  // let [scalpEntryPrice, setScalpEntryPrice] = useState(0)
+  // let [scalpStrikePrice, setScalpStrikePrice] = useState(0)
 
-  useEffect(()=>{
-    entryStrike != niftyStrike ? exitOrder(): console.log('Straddle is good!');
-    // console.log(nifty);
-    // return ()=>{
-    //   setStraddle(clearInterval(straddle))
-    //   setFeed(clearInterval(feed))
-    // }
-  },[check])
+  useEffect(() => {
+    entryStrike != niftyStrike ? exitOrder() : console.log('Straddle is good!');
+  }, [check])
+
 
   function straddleCheck() {
-    setCheck(check = check+1)
+    setCheck(check = check + 1)
   }
 
   function startStraddle() {
@@ -47,7 +38,7 @@ export default function PriceFeed() {
     console.log('Straddle started ✔');
   }
   function stopStraddle() {
-    setStraddle(clearInterval(straddle))
+    setStraddle(clearInterval(straddle));
     // clearInterval(count);
     console.log('Straddle stopped ❌');
   }
@@ -65,7 +56,7 @@ export default function PriceFeed() {
     // feed = 0;
   }
 
-  function pricestream(){
+  function pricestream() {
     axios.get('/pricestream')
       .then((res) => {
         // console.log(res);
@@ -131,15 +122,15 @@ export default function PriceFeed() {
   }
 
   function placeOrder() {
-    console.log('Entering strike - '+ niftyStrike);
+    console.log('Entering strike - ' + niftyStrike);
     setEntryStrike(niftyStrike)
     axios.post('/placeorder', { 'ce': index + expiry + 'P' + niftyStrike, 'pe': index + expiry + 'C' + niftyStrike })
-    .then((res) => {
-      // console.log(res);
-      if (res.data[0].stat && res.data[1].stat == 'Ok') {
+      .then((res) => {
+        // console.log(res);
+        if (res.data[0].stat && res.data[1].stat == 'Ok') {
           startStraddle();
-          console.log('New order placed at - '+ niftyStrike);
-          console.log('Order Count = '+ orderCount);
+          console.log('New order placed at - ' + niftyStrike);
+          console.log('Order Count = ' + orderCount);
           // console.log(niftyStrike);
           // console.log(entryStrike);
           // setOrderNum({ 'ord1': res.data[0].norenordno, 'ord2': res.data[0].norenordno })
@@ -155,7 +146,7 @@ export default function PriceFeed() {
 
   function exitOrder() {
     stopStraddle();
-    console.log('Exiting strike - '+ entryStrike);
+    console.log('Exiting strike - ' + entryStrike);
     axios.post('/exitorder', { 'ce': index + expiry + 'P' + entryStrike, 'pe': index + expiry + 'C' + entryStrike })
       .then((res) => {
         console.log(res);
@@ -213,7 +204,7 @@ export default function PriceFeed() {
 
     <div className='priceFeedSec'>
       <div className="sub_">
-      <div className="priceFeedSettings">
+        <div className="priceFeedSettings">
           <button onClick={startFeed}>Start Feed</button>
           <button onClick={stopFeed}>Stop Feed</button>
           <select name="Select Index" onChange={(e) => { setIndex(e.target.value) }}>
@@ -258,9 +249,19 @@ export default function PriceFeed() {
         <button onClick={startStraddle}>Start Straddle</button>
         <button onClick={stopStraddle}>Stop Straddle</button>
       </div>
-      <div className="sub_">
-        <span>options data</span>
-      </div>
+      {/* <div className="sub_">
+        <div className='scalpingSec'>
+          <div>Scalping</div>
+          <div>
+            <input type="text" placeholder='Entry Price'
+              onChange={(e) => { setScalpEntryPrice(e.target.value); setScalpStrikePrice(Math.round(e.target.value / 50) * 50); }} />
+          </div>
+          <div>
+            <button>Long</button>
+            <button>Short</button>
+          </div>
+        </div>
+      </div> */}
     </div>
   )
 }

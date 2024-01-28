@@ -123,3 +123,41 @@ def exitorder():
     print(ord1)
     print(ord2)
     return jsonify(ord1,ord2)
+
+def placescalporder():
+    res = request.get_json()
+    ord1 = api.place_order(buy_or_sell='B', product_type='M',
+                            exchange='NFO', tradingsymbol=res['ce'], 
+                            quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                            retention='DAY', remarks='Buy')
+    print(ord1)
+    # print(ord2)
+    return jsonify(ord1)
+
+def placescalporderlong():
+    res = request.get_json()
+    ord1 = api.place_order(buy_or_sell='S', product_type='M',
+                            exchange='NFO', tradingsymbol=res['pe'], 
+                            quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                            retention='DAY', remarks='order1')
+    ord2 = api.place_order(buy_or_sell='B', product_type='M',
+                            exchange='NFO', tradingsymbol=res['ce'], 
+                            quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                            retention='DAY', remarks='order2')
+    print(ord1)
+    print(ord2)
+    return jsonify(ord1,ord2)
+
+def placescalpordershort():
+    res = request.get_json()
+    ord1 = api.place_order(buy_or_sell='S', product_type='M',
+                            exchange='NFO', tradingsymbol=res['ce'], 
+                            quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                            retention='DAY', remarks='order1')
+    ord2 = api.place_order(buy_or_sell='B', product_type='M',
+                            exchange='NFO', tradingsymbol=res['pe'], 
+                            quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                            retention='DAY', remarks='order2')
+    print(ord1)
+    print(ord2)
+    return jsonify(ord1,ord2)

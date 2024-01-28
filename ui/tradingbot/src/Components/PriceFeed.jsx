@@ -34,23 +34,26 @@ export default function PriceFeed() {
 
   function startStraddle() {
     // count = setInterval(straddleCheck, 1000)
-    setStraddle(setInterval(straddleCheck, 1000));
+    let straddleIntervalId = setInterval(straddleCheck, 500)
+    setStraddle(straddleIntervalId);
     console.log('Straddle started ✔');
   }
   function stopStraddle() {
-    setStraddle(clearInterval(straddle));
+    clearInterval(straddle);
     // clearInterval(count);
     console.log('Straddle stopped ❌');
   }
 
   function startFeed() {
     // clearInterval(feed);
-    setFeed(setInterval(pricestream, 1000));
+    let feedIntervalId = setInterval(pricestream, 500)
+    setFeed(feedIntervalId);
+    console.log('Price Feed Started!');
     // feed = setInterval(PriceFeed, 1000);
   }
   function stopFeed() {
     // clearInterval(feed);
-    setFeed(clearInterval(feed))
+    clearInterval(feed)
     console.log('Price Feed Stopped ❌');
     // setFeed(0)
     // feed = 0;
@@ -215,7 +218,7 @@ export default function PriceFeed() {
             <option value="MIDCPNIFTY">Midcap Nifty</option>
           </select>
           <select name='expiry' onChange={(e) => { setExpiry(e.target.value) }}>
-            <option name="Select Expiry" selected disabled hidden >Expiry</option>
+            <option value="Select Expiry" defaultValue disabled hidden >Expiry</option>
             <option value="25JAN24">25 Jan 2024</option>
             <option value="01FEB24">01 Feb 2024</option>
             <option value="08FEB24">08 Feb 2024</option>

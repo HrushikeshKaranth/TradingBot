@@ -4,6 +4,7 @@ from api_helper import ShoonyaApiPy
 import logging
 import pyotp
 import pandas as pd
+import time
 
 
 def login():
@@ -51,6 +52,7 @@ def pricefeednifty():
     # ret = api.get_quotes(exchange='NSE', token='26000')
     ret = api.get_quotes(exchange='NSE', token='26000')
     # print(ret['lp'])
+    # print ('Sending feed...')
     return jsonify(ret)
 
 def pricefeedbanknifty():
@@ -76,6 +78,7 @@ def pricestream():
     bankNifty = api.get_quotes(exchange='NSE', token='26009')
     finNifty = api.get_quotes(exchange='NSE', token='26037')
     midcap = api.get_quotes(exchange='NSE', token='26074')
+    print('Sending price feed...')
     return jsonify(nifty['lp'], bankNifty['lp'], finNifty['lp'], midcap['lp'])
 
 def placeorder():
@@ -124,13 +127,25 @@ def exitorder():
     print(ord2)
     return jsonify(ord1,ord2)
 
-def placescalporder():
+def placescalporderce():
     res = request.get_json()
     ord1 = api.place_order(buy_or_sell='B', product_type='M',
                             exchange='NFO', tradingsymbol=res['ce'], 
                             quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
                             retention='DAY', remarks='Buy')
     print(ord1)
+    print('Bought - '+ res['ce'])
+    return jsonify(ord1)
+
+
+def placescalporderpe():
+    res = request.get_json()
+    ord1 = api.place_order(buy_or_sell='B', product_type='M',
+                            exchange='NFO', tradingsymbol=res['pe'], 
+                            quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                            retention='DAY', remarks='Buy')
+    print(ord1)
+    print('Bought - '+ res['pe'])
     # print(ord2)
     return jsonify(ord1)
 
@@ -146,6 +161,7 @@ def placescalporderlong():
                             retention='DAY', remarks='order2')
     print(ord1)
     print(ord2)
+    print('Sold - '+res['pe']+' and '+'Bought - '+res['ce'])
     return jsonify(ord1,ord2)
 
 def placescalpordershort():
@@ -160,8 +176,90 @@ def placescalpordershort():
                             retention='DAY', remarks='order2')
     print(ord1)
     print(ord2)
+    print('Sold - '+res['ce']+' and '+'Bought - '+res['pe'])
     return jsonify(ord1,ord2)
 
 def exitallorders():
     ret = api.get_order_book()
     print(ret)
+
+
+expiry = '01FEB24'
+enteredLong = False
+enteredShort = False
+entered = False
+
+def scalping():
+    global enteredLong 
+    global enteredShort 
+    global entered 
+    res = request.get_json()
+    entryPrice = str(res['entryPrice'])
+    entryStrike = str(res['entryStrike'])
+    # expiry = res['expiry']
+    symbolCE = 'NIFTY'+expiry+'C'+entryStrike
+    symbolPE = 'NIFTY'+expiry+'P'+entryStrike
+    # entered = False
+    while True:
+        nifty = api.get_quotes(exchange='NSE', token='26000')
+        niftyPrice = nifty['lp']
+        if niftyPrice < entryPrice :
+            if entered == False and enteredShort == False and enteredLong == False:
+                # if enteredShort == False:
+                ord1 = api.place_order(buy_or_sell='B', product_type='M',
+                            exchange='NFO', tradingsymbol=symbolCE, 
+                            quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                            retention='DAY', remarks='Buy')
+                    # print(ord1)
+                print('Bought CE - '+ symbolCE)
+                entered = True
+                enteredLong = True
+            elif enteredLong == False and enteredShort == True:
+                ord1 = api.place_order(buy_or_sell='S', product_type='M',
+                        exchange='NFO', tradingsymbol=symbolPE, 
+                        quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks='Buy')
+                ord2 = api.place_order(buy_or_sell='B', product_type='M',
+                        exchange='NFO', tradingsymbol=symbolCE, 
+                        quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks='Buy')
+                enteredShort = False
+                enteredLong = True
+                # print(ord1)
+                # print(ord2)
+                print('Sold PE - '+symbolPE+', '+'Bought CE - '+symbolCE)
+            else :
+                print('In Trade...')
+        elif niftyPrice > entryPrice:
+            if entered == False and enteredShort == False and enteredLong == False:
+                ord1 = api.place_order(buy_or_sell='B', product_type='M',
+                            exchange='NFO', tradingsymbol=symbolPE, 
+                            quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                            retention='DAY', remarks='Buy')
+                    # print(ord1)
+                print('Bought CE - '+ symbolCE)
+                entered = True
+                enteredShort = True
+            elif enteredLong == True and enteredShort == False:
+                ord1 = api.place_order(buy_or_sell='S', product_type='M',
+                        exchange='NFO', tradingsymbol=symbolCE, 
+                        quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks='Buy')
+                ord2 = api.place_order(buy_or_sell='B', product_type='M',
+                        exchange='NFO', tradingsymbol=symbolPE, 
+                        quantity=50, discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks='Buy')
+                enteredLong = False
+                enteredShort = True
+                # print(ord1)
+                # print(ord2)
+                print('Sold CE - '+symbolCE+', '+'Bought PE - '+symbolPE)
+            else :
+                print('In Trade...')
+        else:
+            print('Waiting for entry...')
+        # time.sleep(0.5)
+        # print(entered)
+        # print(enteredLong)
+        # print(enteredShort)
+    return jsonify('ok')

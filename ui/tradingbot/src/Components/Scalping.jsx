@@ -27,6 +27,7 @@ function Scalping() {
     }
     function stopScalp() {
         setScalp(clearInterval(scalp))
+        console.log('Scalping terminated!');
     }
     function scalping() {
         setCheck(check = check + 1)
@@ -145,10 +146,17 @@ function Scalping() {
 
     // ----- Kill Switch ----- //
     function killSwitch(){
-        console.log('Killing all trades');
+        console.log('Killing Everything ⚠');
         stopScalpCheck();
         stopScalp();
         stopFeed();
+        // axios.get('/exitallorders')
+        // .then((res)=>{
+        //     console.log(res);
+        // })
+        // .catch((err)=>{
+        //     console.log(err);
+        // })
     }
     // ----- Kill Switch End ----- //
 

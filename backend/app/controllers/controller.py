@@ -161,3 +161,7 @@ def placescalpordershort():
     print(ord1)
     print(ord2)
     return jsonify(ord1,ord2)
+
+def exitallorders():
+    ret = api.get_order_book()
+    print(ret)

@@ -13,6 +13,8 @@ function Scalping() {
     let [enteredLong, setEnteredLong] = useState(false)
     let [enteredShort, setEnteredShort] = useState(false)
     let [expiry, setExpiry] = useState('29JAN24')
+    let [index, setIndex] = useState('MIDCPNIFTY')
+    let [qty, setQty] = useState(75)
     let [scalpCheckInterval, setScalpCheckInterval] = useState(null)
     let [tradeCheckInterval, setTradeCheckInterval] = useState(null)
     // console.log(scalpEntryPrice);MIDCPNIFTY29JAN24C10725
@@ -111,7 +113,7 @@ function Scalping() {
     function goLong() {
         // stopTradeCheck();
         // console.log('Entering at - ' + nifty);
-        axios.post('/placescalporderlong', { 'ce': 'MIDCPNIFTY' + expiry + 'C' + scalpStrikePrice, 'pe': 'MIDCPNIFTY' + expiry + 'P' + scalpStrikePrice })
+        axios.post('/placescalporderlong', { 'ce': index + expiry + 'C' + scalpStrikePrice, 'pe': index + expiry + 'P' + scalpStrikePrice, 'qty':qty })
         .then((res) => {
             // console.log(res);
             if (res.data[0].stat && res.data[1].stat == 'Ok') {
@@ -131,7 +133,7 @@ function Scalping() {
     function goShort() {
         // stopTradeCheck();
         // console.log('Entering at - ' + nifty);
-        axios.post('/placescalpordershort', { 'ce': 'MIDCPNIFTY' + expiry + 'C' + scalpStrikePrice, 'pe': 'MIDCPNIFTY' + expiry + 'P' + scalpStrikePrice })
+        axios.post('/placescalpordershort', { 'ce': index + expiry + 'C' + scalpStrikePrice, 'pe': index + expiry + 'P' + scalpStrikePrice, 'qty':qty })
             .then((res) => {
                 // console.log(res);
                 if (res.data[0].stat && res.data[1].stat == 'Ok') {
@@ -164,7 +166,7 @@ function Scalping() {
     }
     function placeOrderCe() {
         if (entered == false && enteredLong == false && enteredShort == false) {
-            axios.post('/placescalporderce', { 'ce': 'MIDCPNIFTY' + expiry + 'C' + scalpStrikePrice })
+            axios.post('/placescalporderce', { 'ce': index + expiry + 'C' + scalpStrikePrice, 'qty':qty })
                 .then((res) => {
                     console.log(res);
                     if (res.data.stat == 'Ok') {
@@ -195,7 +197,7 @@ function Scalping() {
     function placeOrderPe() {
         if (entered == false && enteredLong == false && enteredShort == false) {
             setentered(true)
-            axios.post('/placescalporderpe', { 'pe': 'MIDCPNIFTY' + expiry + 'P' + scalpStrikePrice })
+            axios.post('/placescalporderpe', { 'pe': index + expiry + 'P' + scalpStrikePrice,'qty':qty })
                 .then((res) => {
                     console.log(res);
                     if (res.data.stat == 'Ok') {
@@ -349,7 +351,7 @@ function Scalping() {
 
     function enterTrade() {
         if (scalpEntryPrice < nifty) {
-            axios.post('/placescalporderpe', { 'pe': 'MIDCPNIFTY' + expiry + 'P' + scalpStrikePrice })
+            axios.post('/placescalporderpe', { 'pe': index + expiry + 'P' + scalpStrikePrice, 'qty':qty})
                 .then((res) => {
                     console.log(res);
                     if (res.data.stat == 'Ok') {
@@ -369,7 +371,7 @@ function Scalping() {
                 })
             }
             else{
-                axios.post('/placescalporderce', { 'ce': 'MIDCPNIFTY' + expiry + 'C' + scalpStrikePrice })
+                axios.post('/placescalporderce', { 'ce': index + expiry + 'C' + scalpStrikePrice, 'qty':qty })
                 .then((res) => {
                     console.log(res);
                     if (res.data.stat == 'Ok') {

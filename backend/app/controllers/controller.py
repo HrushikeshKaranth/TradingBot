@@ -73,12 +73,18 @@ def pricefeedmidcap():
     # print(ret['lp'])
     return jsonify(ret)
 
+def pricefeedsensex():
+    # ret = api.get_quotes(exchange='NSE', token='26000')
+    ret = api.get_quotes(exchange='BSE', token='1')
+    # print(ret['lp'])
+    return jsonify(ret)
+
 def pricestream():
     nifty = api.get_quotes(exchange='NSE', token='26000')
     bankNifty = api.get_quotes(exchange='NSE', token='26009')
     finNifty = api.get_quotes(exchange='NSE', token='26037')
     midcap = api.get_quotes(exchange='NSE', token='26074')
-    print('Sending price feed...')
+    # print('Sending price feed...')
     return jsonify(nifty['lp'], bankNifty['lp'], finNifty['lp'], midcap['lp'])
 
 def placeorder():
@@ -181,14 +187,21 @@ def placescalpordershort():
 
 def exitallorders():
     # ret = api.get_order_book()
-    ret = api.get_positions()
+    # ret = api.get_positions()
     # print(ret[0]['tsym'])
-    for i in range(len(ret)):
-        ord = api.place_order(buy_or_sell='S', product_type='M',
-                            exchange='NFO', tradingsymbol=ret[i]['tsym'], 
-                            quantity=ret[i]['daybuyqty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
-                            retention='DAY', remarks='order2')
-    return jsonify(ret)
+    # for i in range(len(ret)):
+    #     ord = api.place_order(buy_or_sell='S', product_type='M',
+    #                         exchange='NFO', tradingsymbol=ret[i]['tsym'], 
+    #                         quantity=ret[i]['daybuyqty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+    #                         retention='DAY', remarks='order2')
+    a=api.positions()
+    a=pd.DataFrame(a)
+    for i in a.itertuples():
+        if int(i.netqty)<0: 
+            api.place_order(buy_or_sell='B', product_type='M', exchange='NFO', tradingsymbol=i.tysm,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None, retention='DAY', remarks='my_order_001')
+        if int(i.netqty)>0: 
+            api.place_order(buy_or_sell='S', product_type='M', exchange='NFO', tradingsymbol=i.tysm,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None,retention='DAY', remarks='my_order_002')
+    return jsonify(a)
 
 expiry = '01FEB24'
 enteredLong = False

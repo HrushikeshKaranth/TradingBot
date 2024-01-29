@@ -1,0 +1,34 @@
+{
+    "data":[
+        {   
+            "id":1,
+            "index":"NIFTY",
+            "date":"01FEB24",
+            "qty":50
+        },
+        {
+            "id":2,
+            "index":"BANKNIFTY",
+            "date":"31JAN24",
+            "qty":15
+        },
+        {
+            "id":3,
+            "index":"FINNIFTY",
+            "date":"30JAN24",
+            "qty":40
+        },
+        {
+            "id":4,
+            "index":"MIDCPNIFTY",
+            "date":"05FEB24",
+            "qty":75
+        },
+        {
+            "id":5,
+            "index":"SENSEX",
+            "date":"03FEB24",
+            "qty":10
+        }
+    ]
+}

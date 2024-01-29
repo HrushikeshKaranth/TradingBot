@@ -17,14 +17,36 @@ export default function PriceFeed() {
   let [orderNum, setOrderNum] = useState({})
   let [entryStrike, setEntryStrike] = useState('')
   const [straddle, setStraddle] = useState(null)
+  let [qty, setQty] = useState(50)
   let [check, setCheck] = useState(0)
   let count = null
-  let [orderCount, setOrderCount] = useState(0)
+  let [orderCount, setOrderCount] = useState(2)
+  let [entryPrice, setEntryPrice]  = useState(0)
+  let [isOrderPlaced, setIsOrderPlaced] = useState(false)
   // let [scalpEntryPrice, setScalpEntryPrice] = useState(0)
   // let [scalpStrikePrice, setScalpStrikePrice] = useState(0)
-
+console.log(isOrderPlaced);
+console.log(entryPrice);
   useEffect(() => {
-    entryStrike != niftyStrike ? exitOrder() : console.log('Straddle is good!');
+    if(isOrderPlaced == true && entryStrike != niftyStrike){
+      if(entryPrice - nifty < - 4 || entryPrice - nifty > 4){
+        console.log('inside');
+        exitOrder();
+        
+      }
+      else{console.log('Straddle is good!');}
+    }
+    else if(isOrderPlaced == false){
+      console.log('outside');
+      // console.log('Straddle is good!');
+      // setIsOrderPlaced(true)
+      entryStrike != niftyStrike ? exitOrder() : console.log('Straddle is good!');
+    }
+    else{
+      console.log('Waiting for entry!');
+    }
+    // else{
+    // }
   }, [check])
 
 
@@ -122,12 +144,13 @@ export default function PriceFeed() {
       .catch((err) => {
         console.log(err);
       })
-  }
-
-  function placeOrder() {
-    console.log('Entering strike - ' + niftyStrike);
-    setEntryStrike(niftyStrike)
-    axios.post('/placeorder', { 'ce': index + expiry + 'P' + niftyStrike, 'pe': index + expiry + 'C' + niftyStrike })
+    }
+    
+    function placeOrder() {
+      console.log('Entering strike - ' + niftyStrike);
+      setEntryStrike(niftyStrike)
+      setEntryPrice(nifty)
+    axios.post('/placeorder', { 'ce': index + expiry + 'P' + niftyStrike, 'pe': index + expiry + 'C' + niftyStrike,'qty':qty })
       .then((res) => {
         // console.log(res);
         if (res.data[0].stat && res.data[1].stat == 'Ok') {
@@ -150,13 +173,14 @@ export default function PriceFeed() {
   function exitOrder() {
     stopStraddle();
     console.log('Exiting strike - ' + entryStrike);
-    axios.post('/exitorder', { 'ce': index + expiry + 'P' + entryStrike, 'pe': index + expiry + 'C' + entryStrike })
+    axios.post('/exitorder', { 'ce': index + expiry + 'P' + entryStrike, 'pe': index + expiry + 'C' + entryStrike, 'qty':qty })
       .then((res) => {
         console.log(res);
         if (res.data[0].stat && res.data[1].stat == 'Ok') {
           console.log('order exited!');
           // setOrderNum({ 'ord1': res.data[0].norenordno, 'ord2': res.data[0].norenordno })
           console.log('Re-entering new strike!');
+          setIsOrderPlaced(true)
           placeOrder();
           setOrderCount(orderCount = orderCount + 2)
         }
@@ -185,7 +209,7 @@ export default function PriceFeed() {
   }
 
   function closeOrder() {
-    axios.post('/exitorder', { 'ce': index + expiry + 'P' + entryStrike, 'pe': index + expiry + 'C' + entryStrike })
+    axios.post('/exitorder', { 'ce': index + expiry + 'P' + entryStrike, 'pe': index + expiry + 'C' + entryStrike,'qty':qty })
       .then((res) => {
         console.log(res);
         if (res.data[0].stat && res.data[1].stat == 'Ok') {

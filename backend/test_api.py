@@ -1,21 +1,27 @@
 from api_helper import ShoonyaApiPy
-import logging
+import logging,pyotp
+from api_helper import ShoonyaApiPy
+import pandas as pd
 
-# enable dbug to see request and responses
-logging.basicConfig(level=logging.DEBUG)
-
-# start of our program
 api = ShoonyaApiPy()
-
+ # enable dbug to see request and responses
+logging.basicConfig(level=logging.DEBUG)
 # credentials
-user = 'FA196478'
-pwd = 'Hrushi@476'
-factor2 = 'TPY6T3M3F536E7C4757IL466424J53E5'
-vc = 'FA196478_U'
-app_key = '0d2eb21c0ff1ab424f4233a3cb82aab5'
-imei = 'abc1234'
-
+user    = 'FA196478'
+pwd     = 'Hrushi@476'
+factor2 = 'TGZZ6WQUA723WS57SI65Z66SC6Q36635'
+vc      = 'FA196478_U'
+apikey  = '0d2eb21c0ff1ab424f4233a3cb82aab5'
+imei    = 'abc1234'
+# with open('cred.yml') as f:
+#     cred = yaml.load(f, Loader=yaml.FullLoader)
+#     print(cred)
 # make the api call
-ret = api.login(userid=user, password=pwd, twoFA=factor2, vendor_code=vc, api_secret=app_key, imei=imei)
+otp = pyotp.TOTP(factor2).now()
+ret = api.login(userid=user, password=pwd, twoFA=otp, vendor_code=vc, api_secret=apikey, imei=imei)
+# print(ret)
+# ret = api.get_security_info(exchange='NSE', token='26000')
+print('Logged in - '+ret['uname'])
 
-print(ret)
+ret = api.searchscrip('BSE','sensex')
+print(pd.DataFrame(ret))

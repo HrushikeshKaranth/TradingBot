@@ -12,10 +12,10 @@ function Scalping() {
     let [entered, setentered] = useState(false)
     let [enteredLong, setEnteredLong] = useState(false)
     let [enteredShort, setEnteredShort] = useState(false)
-    let [expiry, setExpiry] = useState('01FEB24')
+    let [expiry, setExpiry] = useState('29JAN24')
     let [scalpCheckInterval, setScalpCheckInterval] = useState(null)
     let [tradeCheckInterval, setTradeCheckInterval] = useState(null)
-    // console.log(scalpEntryPrice);
+    // console.log(scalpEntryPrice);MIDCPNIFTY29JAN24C10725
     useEffect(() => {
         if (nifty - scalpEntryPrice >= -1 && nifty - scalpEntryPrice <= 1) {
             stopScalp();
@@ -96,7 +96,7 @@ function Scalping() {
         console.log('Price Feed Stopped ❌');
     }
     function PriceFeed() {
-        axios.get('/pricefeednifty')
+        axios.get('/pricefeedmidcap')
             .then((res) => {
                 // console.log(res);
                 setNifty(res.data['lp'])
@@ -111,7 +111,7 @@ function Scalping() {
     function goLong() {
         // stopTradeCheck();
         // console.log('Entering at - ' + nifty);
-        axios.post('/placescalporderlong', { 'ce': 'NIFTY' + expiry + 'C' + scalpStrikePrice, 'pe': 'NIFTY' + expiry + 'P' + scalpStrikePrice })
+        axios.post('/placescalporderlong', { 'ce': 'MIDCPNIFTY' + expiry + 'C' + scalpStrikePrice, 'pe': 'MIDCPNIFTY' + expiry + 'P' + scalpStrikePrice })
         .then((res) => {
             // console.log(res);
             if (res.data[0].stat && res.data[1].stat == 'Ok') {
@@ -131,7 +131,7 @@ function Scalping() {
     function goShort() {
         // stopTradeCheck();
         // console.log('Entering at - ' + nifty);
-        axios.post('/placescalpordershort', { 'ce': 'NIFTY' + expiry + 'C' + scalpStrikePrice, 'pe': 'NIFTY' + expiry + 'P' + scalpStrikePrice })
+        axios.post('/placescalpordershort', { 'ce': 'MIDCPNIFTY' + expiry + 'C' + scalpStrikePrice, 'pe': 'MIDCPNIFTY' + expiry + 'P' + scalpStrikePrice })
             .then((res) => {
                 // console.log(res);
                 if (res.data[0].stat && res.data[1].stat == 'Ok') {
@@ -164,7 +164,7 @@ function Scalping() {
     }
     function placeOrderCe() {
         if (entered == false && enteredLong == false && enteredShort == false) {
-            axios.post('/placescalporderce', { 'ce': 'NIFTY' + expiry + 'C' + scalpStrikePrice })
+            axios.post('/placescalporderce', { 'ce': 'MIDCPNIFTY' + expiry + 'C' + scalpStrikePrice })
                 .then((res) => {
                     console.log(res);
                     if (res.data.stat == 'Ok') {
@@ -195,7 +195,7 @@ function Scalping() {
     function placeOrderPe() {
         if (entered == false && enteredLong == false && enteredShort == false) {
             setentered(true)
-            axios.post('/placescalporderpe', { 'pe': 'NIFTY' + expiry + 'P' + scalpStrikePrice })
+            axios.post('/placescalporderpe', { 'pe': 'MIDCPNIFTY' + expiry + 'P' + scalpStrikePrice })
                 .then((res) => {
                     console.log(res);
                     if (res.data.stat == 'Ok') {
@@ -349,7 +349,7 @@ function Scalping() {
 
     function enterTrade() {
         if (scalpEntryPrice < nifty) {
-            axios.post('/placescalporderpe', { 'pe': 'NIFTY' + expiry + 'P' + scalpStrikePrice })
+            axios.post('/placescalporderpe', { 'pe': 'MIDCPNIFTY' + expiry + 'P' + scalpStrikePrice })
                 .then((res) => {
                     console.log(res);
                     if (res.data.stat == 'Ok') {
@@ -369,7 +369,7 @@ function Scalping() {
                 })
             }
             else{
-                axios.post('/placescalporderce', { 'ce': 'NIFTY' + expiry + 'C' + scalpStrikePrice })
+                axios.post('/placescalporderce', { 'ce': 'MIDCPNIFTY' + expiry + 'C' + scalpStrikePrice })
                 .then((res) => {
                     console.log(res);
                     if (res.data.stat == 'Ok') {
@@ -416,7 +416,7 @@ function Scalping() {
             <div>Nifty : {nifty}</div>
             <div>
                 <div>
-                    <input type="text" placeholder='Entry price' onChange={(e) => { setScalpEntryPrice(e.target.value); setScalpStrikePrice(Math.round(e.target.value / 50) * 50) }} />
+                    <input type="text" placeholder='Entry price' onChange={(e) => { setScalpEntryPrice(e.target.value); setScalpStrikePrice(Math.round(e.target.value / 25) * 25) }} />
                 </div>
                 <button onClick={startScalp}>Start Scalping</button>
                 {/* <button onClick={stopScalp}>Stop Waiting</button> */}

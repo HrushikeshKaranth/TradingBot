@@ -15,7 +15,7 @@ function Scalping() {
     let [expiry, setExpiry] = useState('01FEB24')
     let [scalpCheckInterval, setScalpCheckInterval] = useState(null)
     let [tradeCheckInterval, setTradeCheckInterval] = useState(null)
-
+    // console.log(scalpEntryPrice);
     useEffect(() => {
         if (nifty - scalpEntryPrice >= -1 && nifty - scalpEntryPrice <= 1) {
             stopScalp();
@@ -29,11 +29,11 @@ function Scalping() {
     }, [check])
 
     useEffect(()=>{
-        if(entered == true && enteredLong == true && scalpEntryPrice < nifty){
+        if(entered == true && enteredLong == true && scalpEntryPrice > nifty){
             stopTradeCheck();
             goShort();
         }
-        else if(entered == true && enteredShort == true && scalpEntryPrice > nifty){
+        else if(entered == true && enteredShort == true && scalpEntryPrice < nifty){
             stopTradeCheck();
             goLong();
         }
@@ -98,6 +98,7 @@ function Scalping() {
     function PriceFeed() {
         axios.get('/pricefeednifty')
             .then((res) => {
+                // console.log(res);
                 setNifty(res.data['lp'])
             })
             .catch((err) => {
@@ -389,6 +390,12 @@ function Scalping() {
         }
     }
 
+    function closePositions(){
+        axios.get('/exitallorders')
+        .then((res)=>{console.log(res);})
+        .catch((err)=>{console.log(err);})
+    }
+
     function scalpPython() {
         axios.post('/scalping', { 'entryPrice': scalpEntryPrice, 'entryStrike': scalpStrikePrice })
             .then((res) => {
@@ -415,6 +422,7 @@ function Scalping() {
                 {/* <button onClick={stopScalp}>Stop Waiting</button> */}
                 <button onClick={stopScalpCheck}>Stop Scalping</button>
                 <button onClick={stopTradeCheck}>Stop Trades</button>
+                <button onClick={closePositions}>Close Positions</button>
                 <button onClick={killSwitch}>Kill Everything</button>
                 {/* <button onClick={scalpPython}>Scalp Python</button> */}
             </div>

@@ -180,9 +180,15 @@ def placescalpordershort():
     return jsonify(ord1,ord2)
 
 def exitallorders():
-    ret = api.get_order_book()
-    print(ret)
-
+    # ret = api.get_order_book()
+    ret = api.get_positions()
+    # print(ret[0]['tsym'])
+    for i in range(len(ret)):
+        ord = api.place_order(buy_or_sell='S', product_type='M',
+                            exchange='NFO', tradingsymbol=ret[i]['tsym'], 
+                            quantity=ret[i]['daybuyqty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                            retention='DAY', remarks='order2')
+    return jsonify(ret)
 
 expiry = '01FEB24'
 enteredLong = False

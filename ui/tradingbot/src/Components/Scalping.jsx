@@ -16,7 +16,7 @@ function Scalping() {
     let [expiryData, setExpryData] = useState(expiryDates.data)
     let [expiry, setExpiry] = useState('29JAN24')
     let [index, setIndex] = useState('MIDCPNIFTY')
-    let [qty, setQty] = useState(75)
+    let [qty, setQty] = useState(0)
     let [scalpCheckInterval, setScalpCheckInterval] = useState(null)
     let [tradeCheckInterval, setTradeCheckInterval] = useState(null)
     let [priceFeedLink, setPriceFeedLink] = useState('/pricefeednifty')

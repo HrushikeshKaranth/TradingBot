@@ -31,6 +31,7 @@ console.log(entryPrice);
     if(isOrderPlaced == true && entryStrike != niftyStrike){
       if(entryPrice - nifty < - 4 || entryPrice - nifty > 4){
         console.log('inside');
+        setIsOrderPlaced(false)
         exitOrder();
         
       }

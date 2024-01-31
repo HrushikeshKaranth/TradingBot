@@ -10,7 +10,7 @@ function ScalpingOptions() {
     let [StraddleSpread, setStraddleSpread] = useState(expiryDates.data[0].straddleSpread)
     const [feed, setFeed] = useState(null)
     const [straddle, setStraddle] = useState(null)
-    let [price, setPrice] = useState(0)
+    let [price, setPrice] = useState(100)
     let [entryPrice, setEntryPrice] = useState(0)
     let [entryStrike, setEntryStrike] = useState('')
     let [currentStrike, setCurrentStrike] = useState(0)
@@ -18,31 +18,137 @@ function ScalpingOptions() {
     let [priceFeedLink, setPriceFeedLink] = useState('/pricefeednifty')
     let [qty, setQty] = useState(0)
     let [check, setCheck] = useState(0)
+    let [check2, setCheck2] = useState(0)
     let [orderCount, setOrderCount] = useState(2)
     let [isOrderPlaced, setIsOrderPlaced] = useState(false)
     let [isCE, setIsCE] = useState(true)
-    let [strike, setStrike ]= useState(0)
+    let [strike, setStrike ]= useState()
     let [optionName, setOptionName] = useState()
-    console.log(optionName);
+    let [scalpCheckInterval, setScalpCheckInterval] = useState(null)
+    let [tradeCheckInterval, setTradeCheckInterval] = useState(null)
+    let [entered, setentered] = useState(false)
+    let [enteredLong, setEnteredLong] = useState(false)
+    let [enteredShort, setEnteredShort] = useState(false)
+    let [scalpEntryPrice, setScalpEntryPrice] = useState(0)
+    let [scalpInterval, setScalpInterval] = useState()
+    // console.log(optionName);
+
     useEffect(() => {
-        // entryStrike != currentStrike ? exitOrder() : console.log('Monitoring...! '+'[Order count - '+orderCount);
-        entryPrice != price ? exitOrder() : console.log('Monitoring...! '+'[Order count - '+orderCount);
-        // if (isOrderPlaced == true && entryStrike != currentStrike) {
-        //     if (entryPrice - price < - StraddleSpread || entryPrice - price > StraddleSpread) {
-        //         console.log('inside');
-        //         setIsOrderPlaced(false)
-        //         exitOrder();
-        //     }
-        //     else { console.log('Monitoring Straddle! In '+'[Order count - '+orderCount); }
-        // }
-        // else if (isOrderPlaced == false) {
-            // console.log('outside');
-        // }
-        // else {
-        //     console.log('Straddle`s Good! ' + '[Order Count - ' + orderCount + ']');
-        // }
+        if (price - entryPrice >= -1 && price - entryPrice <= 1) {
+            stopScalping();
+            console.log('Scalping initiated!');
+            enterTrade();
+        }
+        else { console.log('Waiting for price to reach the entry price!'); }
     }, [check])
 
+    function enterTrade() {
+        if (entryPrice < price) {
+            axios.post('/placeorderopts', { 'option':optionName, 'qty': qty })
+                .then((res) => {
+                    console.log(res);
+                    if (res.data.stat == 'Ok') {
+                        setentered(true)
+                        setEnteredLong(false)
+                        setEnteredShort(true)
+                        let tradeCheckId = setInterval(tradeCheck, 300);
+                        setTradeCheckInterval(tradeCheckId);
+                        console.log('New order placed at - ' + price);
+                    }
+                    else {
+                        alert('Order placing error❗❌')
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+        }
+        else {
+            axios.post('/placeorderoptb', { 'option':optionName, 'qty': qty })
+                .then((res) => {
+                    console.log(res);
+                    if (res.data.stat == 'Ok') {
+                        setentered(true)
+                        setEnteredLong(true)
+                        setEnteredShort(false)
+                        let tradeCheckId = setInterval(tradeCheck, 300);
+                        setTradeCheckInterval(tradeCheckId);
+                        console.log('New order placed at - ' + price);
+                    }
+                    else {
+                        alert('Order placing error❗❌')
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+        }
+    }
+
+    useEffect(() => {
+        if (entered == true && enteredLong == true && entryPrice < price) {
+            stopTradeCheck();
+            goShort();
+        }
+        else if (entered == true && enteredShort == true && entryPrice > price) {
+            stopTradeCheck();
+            goLong();
+        }
+        else {
+            console.log('Monitoring trades...');
+        }
+    }, [check2])
+
+    function goLong(){
+        axios.post('/golongopt',{'option':optionName,'qty':qty*2})
+        .then((res)=>{
+            if(res.data.stat == 'Ok'){
+                setEnteredLong(true);
+                setEnteredShort(false);
+                startTradeCheck()
+                console.log(res);
+            }
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+    }
+    function goShort(){
+        axios.post('/goshortopt',{'option':optionName,'qty':qty*2})
+        .then((res)=>{
+            if(res.data.stat == 'Ok'){
+                setEnteredShort(true);
+                setEnteredLong(false);
+                startTradeCheck()
+                console.log(res);
+            }
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+    }
+
+    function startScalping() {
+        let scalpIntervalId = setInterval(() => { setCheck(check = check + 1) }, 200);
+        // setScalp(setInterval(scalping, 500))
+        setScalpInterval(scalpIntervalId);
+    }
+    function stopScalping() {
+        clearInterval(scalpInterval);
+        // console.log('Scalping terminated!');
+    }
+
+    function tradeCheck() {
+        setCheck2(check2 = check2 + 1);
+    }
+    function stopTradeCheck() {
+        clearInterval(tradeCheckInterval);
+        console.log('Trade monitor paused!');
+    }
+    function startTradeCheck() {
+        let tradeCheckId = setInterval(tradeCheck, 300);
+        setTradeCheckInterval(tradeCheckId);
+    }
     // useEffect(()=>{
     //     isCE?setOptionName({'option':index + expiry + 'C' + strike}):setOptionName({'option':index + expiry + 'P' + strike})
     // },[])
@@ -86,72 +192,10 @@ function ScalpingOptions() {
             })
     }
 
-
-    function placeOrder() {
-        console.log('Entering strike - ' + currentStrike);
-        setEntryStrike(currentStrike)
-        setEntryPrice(price)
-        axios.post('/placeorder', { 'ce': index + expiry + 'P' + currentStrike, 'pe': index + expiry + 'C' + currentStrike, 'qty': qty })
-            .then((res) => {
-                if (res.data[0].stat && res.data[1].stat == 'Ok') {
-                    startStraddle();
-                    console.log('New order placed at - ' + currentStrike);
-                    console.log('New order placed at - ' + price);
-                    console.log('Order Count = ' + orderCount);
-                }
-                else {
-                    alert('Order placing error❗❌')
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-    }
-
-    function exitOrder() {
-        stopStraddle();
-        console.log('Exiting strike - ' + entryStrike);
-        axios.post('/exitorder', { 'ce': index + expiry + 'P' + entryStrike, 'pe': index + expiry + 'C' + entryStrike, 'qty': qty })
-            .then((res) => {
-                console.log(res);
-                if (res.data[0].stat && res.data[1].stat == 'Ok') {
-                    console.log('order exited!');
-                    console.log('Re-entering new strike!');
-                    setIsOrderPlaced(true)
-                    placeOrder();
-                    setOrderCount(orderCount = orderCount + 2)
-                }
-                else {
-                    alert('order exiting error❗❌');
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-    }
-
-    function closeOrder() {
-        axios.post('/exitorder', { 'ce': index + expiry + 'P' + entryStrike, 'pe': index + expiry + 'C' + entryStrike, 'qty': qty })
-            .then((res) => {
-                console.log(res);
-                if (res.data[0].stat && res.data[1].stat == 'Ok') {
-                    console.log('order exited!');
-                    stopStraddle();
-                }
-                else {
-                    alert('order exiting error❗❌');
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-    }
-    // console.log(index + expiry + strike);
-
     function postOptionStrike(){
         let data = {}
         isCE?data = {'option':index + expiry + 'C' + strike}:data = {'option':index + expiry + 'P' + strike}
-        setOptionName(data)
+        setOptionName(data.option)
         // let data = index + expiry + 'P' + strike
         console.log(data);
         axios.post('/getoptiontoken',data)
@@ -189,6 +233,7 @@ function ScalpingOptions() {
                     </span>
                     <button onClick={startFeed}>Start Feed</button>
                     <button onClick={stopFeed}>Stop Feed</button>
+                    <input type="text" placeholder='Entry Price' onChange={(e)=>setEntryPrice(e.target.value)} />
                 </div>
             </div>
             <div className='sub_'>
@@ -199,11 +244,11 @@ function ScalpingOptions() {
                 </div>
             </div>
             <div className="sub_">
-                <button onClick={placeOrder}>Enter</button>
-                <button onClick={exitOrder}>Exit</button>
-                <button onClick={closeOrder}>Close</button>
-                <button onClick={startStraddle}>Start Scalping</button>
-                <button onClick={stopStraddle}>Stop Scalping</button>
+                <button>Enter</button>
+                <button>Exit</button>
+                <button>Close</button>
+                <button onClick={startScalping}>Start Scalping</button>
+                <button onClick={stopScalping}>Stop Scalping</button>
             </div>
         </div>)
 }

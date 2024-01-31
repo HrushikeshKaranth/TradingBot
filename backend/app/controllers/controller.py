@@ -6,7 +6,7 @@ import pyotp
 import pandas as pd
 import time
 
-
+tokenValue = ''
 def login():
     # enable dbug to see request and responses
     logging.basicConfig(level=logging.DEBUG)
@@ -64,7 +64,7 @@ def pricefeedbanknifty():
 def pricefeedfinnifty():
     # ret = api.get_quotes(exchange='NSE', token='26000')
     ret = api.get_quotes(exchange='NSE', token='26037')
-    # print(ret['lp'])
+    # print(ret)
     return jsonify(ret)
 
 def pricefeedmidcap():
@@ -282,3 +282,19 @@ def scalping():
         # print(enteredLong)
         # print(enteredShort)
     return jsonify('ok')
+
+
+def getoptiontoken():
+    res = request.get_json()
+    token = api.searchscrip('NFO', res['option'])
+    global tokenValue
+    tokenValue = repr(int(token['values'][0]['token']))
+    # data = api.get_quotes(exchange='NFO', token=tokenValue)
+    return jsonify(tokenValue)
+
+def getoptionfeed():
+    data = api.get_quotes(exchange='NFO', token=tokenValue)
+    return jsonify(data)
+    # global tokenValue
+    # print (tokenValue)
+    # print(data)

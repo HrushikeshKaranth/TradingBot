@@ -4,6 +4,8 @@ import PriceFeed from './Components/PriceFeed'
 import "./Style/Style.css";
 import axios from './Helpers/Axios'
 import Scalping from "./Components/Scalping";
+import Straddle from "./Components/Straddle";
+import ScalpingOptions from "./Components/ScalpingOptions";
 
 function App() {
   useEffect(()=>{
@@ -37,16 +39,24 @@ function App() {
         {/* </div> */}
       </div>
       {/* Price Feed */}
-      <div className="feed">
-        {/* Nifty 50 Price */}
+      {/* <div className="feed">
         <div className="sub">
           <PriceFeed />
         </div>
+      </div> */}
+      <div className="feed">
+        {/* Nifty 50 Price */}
+        <div className="sub">
+          <Straddle />
+        </div>
+      <div className="sub">
+        <ScalpingOptions/>
       </div>
-      {/* Strategy section */}
       <div className="strat">
         <Scalping/>
       </div>
+      </div>
+      {/* Strategy section */}
     </div>
   );
 }

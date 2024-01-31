@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from '../Helpers/Axios'
+import expiryDates from '../utils/expiryDates.json'
+
 
 export default function PriceFeed() {
 
@@ -17,7 +19,12 @@ export default function PriceFeed() {
   let [orderNum, setOrderNum] = useState({})
   let [entryStrike, setEntryStrike] = useState('')
   const [straddle, setStraddle] = useState(null)
-  let [qty, setQty] = useState(50)
+  let [expiryData, setExpryData] = useState(expiryDates.data)
+  let [price, setPrice] = useState(0)
+  let [currentStrike, setCurrentStrike] = useState(0)
+  let [strikeDistance, setStrikeDistance]= useState(0)
+  let [priceFeedLink, setPriceFeedLink] = useState('/pricefeednifty')
+  let [qty, setQty] = useState(0)
   let [check, setCheck] = useState(0)
   let count = null
   let [orderCount, setOrderCount] = useState(2)
@@ -25,26 +32,27 @@ export default function PriceFeed() {
   let [isOrderPlaced, setIsOrderPlaced] = useState(false)
   // let [scalpEntryPrice, setScalpEntryPrice] = useState(0)
   // let [scalpStrikePrice, setScalpStrikePrice] = useState(0)
-console.log(isOrderPlaced);
-console.log(entryPrice);
+// console.log(isOrderPlaced);
+// console.log(entryPrice);
   useEffect(() => {
     if(isOrderPlaced == true && entryStrike != niftyStrike){
       if(entryPrice - nifty < - 4 || entryPrice - nifty > 4){
         console.log('inside');
         setIsOrderPlaced(false)
         exitOrder();
-        
       }
-      else{console.log('Straddle is good!');}
+      else{console.log('Monitoring Straddle!');}
     }
     else if(isOrderPlaced == false){
       console.log('outside');
       // console.log('Straddle is good!');
       // setIsOrderPlaced(true)
-      entryStrike != niftyStrike ? exitOrder() : console.log('Straddle is good!');
+      entryStrike != niftyStrike ? exitOrder() : console.log('Monitoring Straddle!');
     }
     else{
-      console.log('Waiting for entry!');
+      // console.log('All Good!');
+      // console.log(orderCount);
+      console.log('Straddle`s Good! '+'[Order Count - '+orderCount+']');
     }
     // else{
     // }
@@ -91,20 +99,31 @@ console.log(entryPrice);
         setNiftyStrike(Math.round(res.data[0] / 50) * 50)
         setNifty(res.data[0])
 
-        setNiftyBankStrike(Math.round(res.data[1] / 100) * 100)
-        setNiftyBank(res.data[1])
+        // setNiftyBankStrike(Math.round(res.data[1] / 100) * 100)
+        // setNiftyBank(res.data[1])
 
         setNiftyFinStrike(Math.round(res.data[2] / 50) * 50)
         setNiftyFin(res.data[2])
 
-        setMidcapStrike(Math.round(res.data[3] / 25) * 25)
-        setMidcap(res.data[3])
+        // setMidcapStrike(Math.round(res.data[3] / 25) * 25)
+        // setMidcap(res.data[3])
       })
       .catch((err) => {
         console.log(err);
       })
   }
 
+  function getPrice(){
+    axios.get(priceFeedLink)
+    .then((res) => {
+      // console.log(res.data['lp'])
+      setCurrentStrike(Math.round(res.data['lp'] / strikeDistance) * strikeDistance)
+      setPrice(res.data['lp'])
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+  }
   function PriceFeed() {
     axios.get('/pricefeednifty')
       .then((res) => {
@@ -235,24 +254,37 @@ console.log(entryPrice);
         <div className="priceFeedSettings">
           <button onClick={startFeed}>Start Feed</button>
           <button onClick={stopFeed}>Stop Feed</button>
-          <select name="Select Index" onChange={(e) => { setIndex(e.target.value) }}>
-            <option name="Select Index" selected disabled hidden >Index</option>
-            <option value="NIFTY">Nifty 50</option>
-            <option value="BANKNIFTY">Bank Nifty</option>
-            <option value="FINNIFTY">Fin Nifty</option>
-            <option value="MIDCPNIFTY">Midcap Nifty</option>
-          </select>
-          <select name='expiry' onChange={(e) => { setExpiry(e.target.value) }}>
+          <select name="Select Index"
+                    onChange={(e) => {
+                        setIndex(e.target.value);
+                        if (e.target.value == 'NIFTY') {setExpiry(expiryData[0].date);setQty(expiryData[0].qty);setPriceFeedLink('/pricefeednifty');setStrikeDistance(expiryData[0].strikeDistance)}
+                        else if (e.target.value == 'BANKNIFTY') {setExpiry(expiryData[1].date);setQty(expiryData[1].qty);setPriceFeedLink('/pricefeedbanknifty');setStrikeDistance(expiryData[1].strikeDistance)}
+                        else if (e.target.value == 'FINNIFTY') {setExpiry(expiryData[2].date);setQty(expiryData[2].qty);setPriceFeedLink('/pricefeedfinnifty');setStrikeDistance(expiryData[2].strikeDistance)}
+                        else if (e.target.value == 'MIDCPNIFTY') {setExpiry(expiryData[3].date);setQty(expiryData[3].qty);setPriceFeedLink('/pricefeedmidcap');setStrikeDistance(expiryData[3].strikeDistance)}
+                        else {setExpiry(expiryData[4].date);setQty(expiryData[4].qty);setPriceFeedLink('/pricefeedsensex');setStrikeDistance(expiryData[4].strikeDistance)}
+                    }}>
+                    <option name="Select Index" selected disabled hidden >Index</option>
+                    <option value="NIFTY">Nifty 50</option>
+                    <option value="BANKNIFTY">Bank Nifty</option>
+                    <option value="FINNIFTY">Fin Nifty</option>
+                    <option value="MIDCPNIFTY">Midcap Nifty</option>
+                    <option value="SENSEX">Sensex</option>
+                </select>
+          {/* <select name='expiry' onChange={(e) => { setExpiry(e.target.value) }}>
             <option value="Select Expiry" defaultValue disabled hidden >Expiry</option>
-            <option value="25JAN24">25 Jan 2024</option>
+            <option value="30JAN24">30 Jan 2024</option>
             <option value="01FEB24">01 Feb 2024</option>
             <option value="08FEB24">08 Feb 2024</option>
             <option value="15FEB24">15 Feb 2024</option>
             <option value="22FEB24">22 Feb 2024</option>
-          </select>
+          </select> */}
         </div>
       </div>
       <div className='sub_'>
+        <div className="sub">
+          <span>{index}: {price}</span>
+          <span>Strike: {currentStrike}</span>
+        </div>
         <div className="sub">
           <span>Nifty: {nifty}</span>
           <span>Strike: {niftyStrike}</span>

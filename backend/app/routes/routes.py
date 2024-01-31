@@ -1,5 +1,5 @@
 from flask import Blueprint
-from app.controllers.controller import login, logout, pricefeednifty, pricefeedmidcap, pricefeedfinnifty, pricefeedbanknifty, placeorder, exitorder, pricestream,setsession,placescalporderce,placescalporderpe,placescalporderlong,placescalpordershort,scalping,exitallorders,pricefeedsensex
+from app.controllers.controller import login, logout, pricefeednifty, pricefeedmidcap, pricefeedfinnifty, pricefeedbanknifty, placeorder, exitorder, pricestream,setsession,placescalporderce,placescalporderpe,placescalporderlong,placescalpordershort,scalping,exitallorders,pricefeedsensex,getoptiontoken,getoptionfeed
 
 # Creating routes Blueprint
 routes = Blueprint('routes', __name__)
@@ -15,6 +15,7 @@ routes.route('/pricefeedfinnifty', methods=['GET'])(pricefeedfinnifty)
 routes.route('/pricefeedmidcap', methods=['GET'])(pricefeedmidcap)
 routes.route('/pricefeedsensex', methods=['GET'])(pricefeedsensex)
 routes.route('/pricestream', methods=['GET'])(pricestream)
+routes.route('/getoptionfeed', methods=['GET'])(getoptionfeed)
 routes.route('/placeorder', methods=['POST'])(placeorder)
 routes.route('/exitorder', methods=['POST'])(exitorder)
 routes.route('/placescalporderce', methods=['POST'])(placescalporderce)
@@ -23,3 +24,4 @@ routes.route('/placescalporderlong', methods=['POST'])(placescalporderlong)
 routes.route('/placescalpordershort', methods=['POST'])(placescalpordershort)
 routes.route('/scalping', methods=['POST'])(scalping)
 routes.route('/exitallorders', methods=['GET'])(exitallorders)
+routes.route('/getoptiontoken', methods=['POST'])(getoptiontoken)

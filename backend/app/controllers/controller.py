@@ -185,6 +185,13 @@ def placescalpordershort():
     print('Sold - '+res['ce']+' and '+'Bought - '+res['pe'])
     return jsonify(ord1,ord2)
 
+def placeorderud():
+    res = request.get_json()
+    ord1 = api.place_order(buy_or_sell='S', product_type='M',
+                            exchange='NFO', tradingsymbol=res['opt'], 
+                            quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                            retention='DAY', remarks='order1')
+    return jsonify(ord1)
 def exitallorders():
     # ret = api.get_order_book()
     # ret = api.get_positions()

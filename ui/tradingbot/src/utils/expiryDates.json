@@ -3,7 +3,7 @@
         {   
             "id":1,
             "index":"NIFTY",
-            "date":"01FEB24",
+            "date":"08FEB24",
             "qty":50,
             "strikeDistance":50,
             "straddleSpread":4

@@ -51,7 +51,7 @@ function ScalpingOptions() {
                         setentered(true)
                         setEnteredLong(false)
                         setEnteredShort(true)
-                        let tradeCheckId = setInterval(tradeCheck, 300);
+                        let tradeCheckId = setInterval(tradeCheck, 100);
                         setTradeCheckInterval(tradeCheckId);
                         console.log('New order placed at - ' + price);
                     }
@@ -71,7 +71,7 @@ function ScalpingOptions() {
                         setentered(true)
                         setEnteredLong(true)
                         setEnteredShort(false)
-                        let tradeCheckId = setInterval(tradeCheck, 300);
+                        let tradeCheckId = setInterval(tradeCheck, 100);
                         setTradeCheckInterval(tradeCheckId);
                         console.log('New order placed at - ' + price);
                     }
@@ -86,11 +86,11 @@ function ScalpingOptions() {
     }
 
     useEffect(() => {
-        if (entered == true && enteredLong == true && entryPrice < price) {
+        if (entered == true && enteredLong == true && entryPrice > price) {
             stopTradeCheck();
             goShort();
         }
-        else if (entered == true && enteredShort == true && entryPrice > price) {
+        else if (entered == true && enteredShort == true && entryPrice < price) {
             stopTradeCheck();
             goLong();
         }
@@ -117,9 +117,9 @@ function ScalpingOptions() {
         axios.post('/goshortopt',{'option':optionName,'qty':qty*2})
         .then((res)=>{
             if(res.data.stat == 'Ok'){
-                setEnteredShort(true);
                 setEnteredLong(false);
-                startTradeCheck()
+                setEnteredShort(true);
+                startTradeCheck();
                 console.log(res);
             }
         })
@@ -146,7 +146,7 @@ function ScalpingOptions() {
         console.log('Trade monitor paused!');
     }
     function startTradeCheck() {
-        let tradeCheckId = setInterval(tradeCheck, 300);
+        let tradeCheckId = setInterval(tradeCheck, 100);
         setTradeCheckInterval(tradeCheckId);
     }
     // useEffect(()=>{
@@ -156,18 +156,6 @@ function ScalpingOptions() {
 
     function straddleCheck() {
         setCheck(check = check + 1)
-    }
-
-    function startStraddle() {
-        // count = setInterval(straddleCheck, 1000)
-        let straddleIntervalId = setInterval(straddleCheck, 500)
-        setStraddle(straddleIntervalId);
-        console.log('Straddle started ✔');
-    }
-    function stopStraddle() {
-        clearInterval(straddle);
-        // clearInterval(count);
-        console.log('Straddle stopped ❌');
     }
 
     function startFeed() {

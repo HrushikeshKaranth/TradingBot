@@ -26,21 +26,42 @@ function Sidefly() {
     // let [isDownStrikePlaced, setIsDownStrikePlaced] = useState(false)
     let [isStrikePlaced, setIsStrikePlaced] = useState(false)
 
+    // useEffect(() => {
+    //     if (isOrderPlaced == true && entryStrike != currentStrike) {
+    //         if (entryPrice - price < - StraddleSpread || entryPrice - price > StraddleSpread) {
+    //             console.log('inside');
+    //             setIsOrderPlaced(false)
+    //             exitOrder();
+    //         }
+    //         else { console.log('Monitoring Straddle! In '+'[Order count - '+orderCount); }
+    //     }
+    //     else if (isOrderPlaced == false) {
+    //         entryStrike != currentStrike ? exitOrder() : console.log('Monitoring Straddle! Out '+'[Order count - '+orderCount);
+    //     }
+    //     else {
+    //         console.log('Straddle`s Good! ' + '[Order Count - ' + orderCount + ']');
+    //     }
+    // }, [check])
+
     useEffect(() => {
-        if (isOrderPlaced == true && entryStrike != currentStrike) {
-            if (entryPrice - price < - StraddleSpread || entryPrice - price > StraddleSpread) {
-                console.log('inside');
-                setIsOrderPlaced(false)
-                exitOrder();
+        if (isOrderPlaced == true && price < entryStrike) {
+            // if (entryPrice - price < - StraddleSpread || entryPrice - price > StraddleSpread) {
+                console.log('Going Short...');
+                // setIsOrderPlaced(false)
+                placeDownStrike();
+                // }
+                // else { console.log('Monitoring Straddle! In '+'[Order count - '+orderCount); }
             }
-            else { console.log('Monitoring Straddle! In '+'[Order count - '+orderCount); }
-        }
-        else if (isOrderPlaced == false) {
-            // console.log('outside');
-            entryStrike != currentStrike ? exitOrder() : console.log('Monitoring Straddle! Out '+'[Order count - '+orderCount);
+            else if (isOrderPlaced == true && price > entryStrike) {
+                // console.log('outside');
+                console.log('Going Long...');
+                // setIsOrderPlaced(false)
+                placeUpStrike();
+            // entryStrike != currentStrike ? exitOrder() : console.log('Monitoring Straddle! Out '+'[Order count - '+orderCount);
         }
         else {
-            console.log('Straddle`s Good! ' + '[Order Count - ' + orderCount + ']');
+            enterOrder()
+            // console.log('Straddle`s Good! ' + '[Order Count - ' + orderCount + ']');
         }
     }, [check])
 
@@ -51,7 +72,7 @@ function Sidefly() {
 
     function startStraddle() {
         // count = setInterval(straddleCheck, 1000)
-        let straddleIntervalId = setInterval(straddleCheck, 500)
+        let straddleIntervalId = setInterval(straddleCheck, 300)
         setStraddle(straddleIntervalId);
         console.log('Straddle started ✔');
     }
@@ -95,14 +116,16 @@ function Sidefly() {
     function placeOrder() {
         console.log('Entering strike - ' + currentStrike);
         setEntryStrike(currentStrike)
+        setUpStrike(currentStrike+50)
+        SetDownStrike(currentStrike-50)
         setEntryPrice(price)
         axios.post('/placeorder', { 'ce': index + expiry + 'P' + currentStrike, 'pe': index + expiry + 'C' + currentStrike, 'qty': qty })
             .then((res) => {
                 if (res.data[0].stat && res.data[1].stat == 'Ok') {
-                    // startStraddle();
+                    enterOrder()
                     console.log('New order placed at - ' + currentStrike);
-                    console.log('New order placed at - ' + price);
-                    console.log('Order Count = ' + orderCount);
+                    // console.log('New order placed at - ' + price);
+                    // console.log('Order Count = ' + orderCount);
                 }
                 else {
                     alert('Order placing error❗❌')
@@ -209,13 +232,17 @@ function Sidefly() {
             })
     }
 
-    function closeOrder() {
-        axios.post('/exitorder', { 'ce': index + expiry + 'P' + entryStrike, 'pe': index + expiry + 'C' + entryStrike, 'qty': qty })
+    function enterOrder() {
+        // stopStraddle();
+        if(price  < entryStrike){
+            axios.post('/enterordershort', { 'pe': index + expiry + 'P' + entryStrike, 'qty': qty })
             .then((res) => {
                 console.log(res);
                 if (res.data[0].stat && res.data[1].stat == 'Ok') {
-                    console.log('order exited!');
-                    stopStraddle();
+                    console.log('Short entered!');
+                    setIsOrderPlaced(true)
+                    startStraddle()
+
                 }
                 else {
                     alert('order exiting error❗❌');
@@ -224,6 +251,25 @@ function Sidefly() {
             .catch((err) => {
                 console.log(err);
             })
+        }
+        else if(price > entryStrike){
+            axios.post('/enterorderlong', { 'ce': index + expiry + 'C' + entryStrike, 'qty': qty })
+            .then((res) => {
+                console.log(res);
+                if (res.data[0].stat && res.data[1].stat == 'Ok') {
+                    console.log('Long entered!');
+                    setIsOrderPlaced(true)
+                    startStraddle()
+                }
+                else {
+                    alert('order exiting error❗❌');
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        }
+        else{console.log('No entries!');}
     }
 
     return (

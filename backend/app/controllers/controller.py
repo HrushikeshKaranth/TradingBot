@@ -305,3 +305,35 @@ def getoptionfeed():
     # global tokenValue
     # print (tokenValue)
     # print(data)
+
+def enterordershort():
+    res = request.get_json()
+    print(res)
+    ord = api.place_order(buy_or_sell='B', product_type='M',
+                        exchange='NFO', tradingsymbol=res['pe'], 
+                        quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks='Buy')
+    print(ord)
+    return jsonify(ord)
+
+def enterorderlong():
+    res = request.get_json()
+    print(res)
+    ord = api.place_order(buy_or_sell='B', product_type='M',
+                        exchange='NFO', tradingsymbol=res['ce'], 
+                        quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks='Buy')
+    print(ord)
+    return jsonify(ord)
+
+def closeshortgolong():
+    res = request.get_json()
+    ord1 = api.place_order(buy_or_sell='S', product_type='M',
+                        exchange='NFO', tradingsymbol=res['sell'], 
+                        quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks='Buy')
+    ord2 = api.place_order(buy_or_sell='B', product_type='M',
+                        exchange='NFO', tradingsymbol=res['buy'], 
+                        quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks='Buy')
+    return jsonify(ord1,ord2)

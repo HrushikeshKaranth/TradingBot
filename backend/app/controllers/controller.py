@@ -104,8 +104,8 @@ def placeorder():
     # cesymbolinfo = getSymbol(f'BANKNIFTY {month} {atmstrike} CE')
 
     # remarks = res['remarks']
-    # print(res['ce'])
-    # print(res['pe'])
+    print(res['ce'])
+    print(res['pe'])
     ord1 = api.place_order(buy_or_sell='S', product_type='M',
                             exchange='NFO', tradingsymbol=res['ce'], 
                             quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,

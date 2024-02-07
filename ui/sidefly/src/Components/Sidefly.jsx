@@ -43,27 +43,55 @@ function Sidefly() {
     //     }
     // }, [check])
 
+    // useEffect(() => {
+    //     if (isOrderPlaced == true && entryStrike - price < - StraddleSpread) {
+    //         placeDownStrike();
+    //     }
+    //     else if (isOrderPlaced == true && entryStrike - price > StraddleSpread) {
+    //             placeUpStrike();
+    //     }
+    //     else {
+    //         console.log('All Good! ' + '[Order Count - ' + orderCount + ']');
+    //     }
+    // }, [check])
+
     // console.log(entryStrike);
     // console.log(upStrike);
     // console.log(downStrike);
+    useEffect(()=>{
+        if(localStorage.getItem("entryStrike") != null){
+            setEntryStrike(localStorage.getItem("entryStrike"))
+            console.log(entryStrike);
+        } 
+        else setEntryStrike(0)
+
+    },[])
 
     useEffect(() => {
         if (isDownStrikePlaced == false && price < entryStrike) {
-            // if (entryPrice - price < - StraddleSpread || entryPrice - price > StraddleSpread) {
-            console.log('Going Short...');
-            // setIsOrderPlaced(false)
-            placeDownStrike();
-            // }
+            if (entryStrike - price < - StraddleSpread) {
+                console.log('Going Short...');
+                // setIsDownStrikePlaced(true)
+                placeDownStrike();
+            }
+            else{
+                console.log('Monitoring PUT Side...');
+            }
             // else { console.log('Monitoring Straddle! In '+'[Order count - '+orderCount); }
         }
         else if (isUpStrikePlaced == false && price > entryStrike) {
             // console.log('outside');
-            console.log('Going Long...');
-            // setIsOrderPlaced(false)
-            placeUpStrike();
+            if (entryStrike - price > StraddleSpread) {
+                // setIsUpStrikePlaced(true)
+                console.log('Going Long...');
+                placeUpStrike();
+            }
+            else{
+                console.log('Monitoring CALL Side...');
+            }
             // entryStrike != currentStrike ? exitOrder() : console.log('Monitoring Straddle! Out '+'[Order count - '+orderCount);
         }
-        else{console.log('Monitoring..! [Order count - '+orderCount+']');}
+        else{console.log('Monitoring...! [Order count - '+orderCount+']');}
     }, [check])
 
 
@@ -75,12 +103,12 @@ function Sidefly() {
         // count = setInterval(straddleCheck, 1000)
         let straddleIntervalId = setInterval(straddleCheck, 300)
         setStraddle(straddleIntervalId);
-        console.log('Straddle started ✔');
+        // console.log('Straddle started ✔');
     }
     function stopStraddle() {
         clearInterval(straddle);
         // clearInterval(count);
-        console.log('Straddle stopped ❌');
+        // console.log('Straddle stopped ❌');
     }
 
     function startFeed() {
@@ -95,16 +123,18 @@ function Sidefly() {
 
     useEffect(() => {
         setCurrentStrike(Math.round(price / strikeDistance) * strikeDistance)
-        // setUpStrike(currentStrike+50)
-        // SetDownStrike(currentStrike-50)
-    }, [price])
+        // setUpStrike(Math.round(price / strikeDistance) * strikeDistance +50)
+        // SetDownStrike(Math.round(price / strikeDistance) * strikeDistance -50)
+        setUpStrike(Number(currentStrike)+50)
+        SetDownStrike(currentStrike-50)
+    }, [price,entryStrike])
 
     useEffect(() => {
         if(isDownStrikePlaced == false && isUpStrikePlaced == false && isOrderPlaced == true) {
             enterOrder();
             // console.log('Straddle`s Good! ' + '[Order Count - ' + orderCount + ']');
         }
-    }, [entryStrike, upStrike, downStrike, isDownStrikePlaced, isUpStrikePlaced,isOrderPlaced])
+    }, [entryStrike ,isOrderPlaced])
 
     function getPrice() {
         axios.get(priceFeedLink)
@@ -112,8 +142,6 @@ function Sidefly() {
                 // console.log(res.data['lp'])
                 setPrice(res.data['lp'])
                 // setCurrentStrike(Math.round(res.data['lp'] / strikeDistance) * strikeDistance)
-                // setUpStrike(Math.round(res.data['lp'] / strikeDistance) * strikeDistance)
-                // SetDownStrike(Math.round(res.data['lp'] / strikeDistance) * strikeDistance)
             })
             .catch((err) => {
                 console.log(err);
@@ -122,13 +150,14 @@ function Sidefly() {
 
 
     function placeOrder() {
-        console.log('Entering strike - ' + currentStrike);
+        // console.log('Entering strike - ' + currentStrike);
         setEntryStrike(currentStrike)
-        setUpStrike(currentStrike + 50)
-        SetDownStrike(currentStrike - 50)
-        console.log('Strike - '+currentStrike + ' Up - '+ upStrike+ ' Down - '+ downStrike);
+        localStorage.setItem("entryStrike", currentStrike)
+        // setUpStrike(currentStrike + 50)
+        // SetDownStrike(currentStrike - 50)
+        // console.log('Strike - '+currentStrike + ' Up - '+ upStrike+ ' Down - '+ downStrike);
         setEntryPrice(price)
-        axios.post('/placeorder', { 'ce': index + expiry + 'P' + currentStrike, 'pe': index + expiry + 'C' + currentStrike, 'qty': qty })
+        axios.post('/placeorder', { 'ce': index + expiry + 'C' + upStrike, 'pe': index + expiry + 'P' + downStrike, 'qty': qty })
             .then((res) => {
                 if (res.data[0].stat && res.data[1].stat == 'Ok') {
                     // setEntryStrike(currentStrike)
@@ -136,7 +165,7 @@ function Sidefly() {
                     // SetDownStrike(currentStrike-50)
                     console.log('New order placed at - ' + currentStrike);
                     setIsOrderPlaced(true);
-                    startStraddle();
+                    // startStraddle();
                     // console.log('New order placed at - ' + price);
                     // console.log('Order Count = ' + orderCount);
                 }
@@ -152,15 +181,17 @@ function Sidefly() {
     function placeUpStrike() {
         stopStraddle();
         // setUpStrike(currentStrike+50)
-        console.log('Entering strike - ' + upStrike);
-        axios.post('/closeshortgolong', { 'sell': index + expiry + 'P' + downStrike, 'buy': index + expiry + 'C' + upStrike, 'qty': qty })
+        // console.log('Entering strike - ' + upStrike);
+        axios.post('/closeshortgolong', { 'sell': index + expiry + 'P' + entryStrike, 'buy': index + expiry + 'C' + entryStrike, 'qty': qty })
             .then((res) => {
                 if (res.data[0].stat && res.data[1].stat == 'Ok') {
                     startStraddle();
                     setIsDownStrikePlaced(false)
                     setIsUpStrikePlaced(true)
-                    console.log('Entered Strike - ' + upStrike);
-                    console.log('Exited Strike - ' + downStrike);
+                    // console.log('Entered Strike - ' + upStrike);
+                    // console.log('Exited Strike - ' + downStrike);
+                    console.log('Sold - ' + entryStrike + ' PE');
+                    console.log('Bought - ' + entryStrike +' CE');
                     setOrderCount(orderCount= orderCount+1)
                     // console.log('Order Count = ' + orderCount);
                 }
@@ -174,15 +205,15 @@ function Sidefly() {
         function placeDownStrike() {
             stopStraddle()
             // SetDownStrike(currentStrike-50)
-            console.log('Entering strike - ' + downStrike);
-            axios.post('/closeshortgolong', { 'sell': index + expiry + 'C' + upStrike, 'buy': index + expiry + 'P' + downStrike, 'qty': qty })
+            // console.log('Entering strike - ' + downStrike);
+            axios.post('/closeshortgolong', { 'sell': index + expiry + 'C' + entryStrike, 'buy': index + expiry + 'P' + entryStrike, 'qty': qty })
             .then((res) => {
                 if (res.data[0].stat && res.data[1].stat == 'Ok') {
                     startStraddle();
                     setIsDownStrikePlaced(true)
                     setIsUpStrikePlaced(false)
-                    console.log('Entered Strike - ' + downStrike);
-                    console.log('Exited Strike - ' + upStrike);
+                    console.log('Sold - ' + entryStrike + ' CE');
+                    console.log('Bought - ' + entryStrike +' PE');
                     setOrderCount(orderCount= orderCount+1)
                     // console.log('Order Count = ' + orderCount);
                 }
@@ -214,12 +245,12 @@ function Sidefly() {
         // SetDownStrike(Number(currentStrike)-Number(50))
         // console.log('Down strike - '+downStrike);
         if (price < entryStrike) {
-            console.log('Entering Strike - ' + downStrike);
-            axios.post('/enterordershort', { 'pe': index + expiry + 'P' + downStrike, 'qty': qty })
+            // console.log('Entering Strike - ' + downStrike);
+            axios.post('/enterordershort', { 'pe': index + expiry + 'P' + entryStrike, 'qty': qty })
                 .then((res) => {
                     console.log(res);
                     if (res.data.stat == 'Ok') {
-                        console.log('Short entered at ' + downStrike);
+                        console.log('PUT entered at ' + entryStrike);
                         setIsOrderPlaced(true)
                         setIsDownStrikePlaced(true)
                         startStraddle();
@@ -233,15 +264,15 @@ function Sidefly() {
                 })
         }
         else if (price > entryStrike) {
-            console.log('Entering Strike - ' + upStrike);
-            axios.post('/enterorderlong', { 'ce': index + expiry + 'C' + upStrike, 'qty': qty })
+            // console.log('Entering Strike - ' + upStrike);
+            axios.post('/enterorderlong', { 'ce': index + expiry + 'C' + entryStrike, 'qty': qty })
                 .then((res) => {
                     console.log(res);
                     if (res.data.stat == 'Ok') {
-                        console.log('Long entered at ' + upStrike);
+                        console.log('CALL entered at ' + entryStrike);
                         setIsOrderPlaced(true)
                         setIsUpStrikePlaced(true)
-                        startStraddle()
+                        startStraddle();
                     }
                     else {
                         alert('order exiting error❗❌');

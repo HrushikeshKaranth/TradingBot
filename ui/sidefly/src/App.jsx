@@ -3,6 +3,7 @@ import Login from "./Components/Login";
 import "./Style/Style.css";
 import axios from './Helpers/Axios'
 import Sidefly from "./Components/Sidefly";
+import SideflySensex from "./Components/SideflySensex";
 
 function App() {
 
@@ -34,8 +35,11 @@ function App() {
       <div className="sub">
         <Login />
       </div>
-      <div className="sub">
+      {/* <div className="sub">
         <Sidefly />
+      </div> */}
+      <div className="sub">
+        <SideflySensex />
       </div>
     </div>
   );

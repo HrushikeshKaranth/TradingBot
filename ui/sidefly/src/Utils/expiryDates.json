@@ -6,7 +6,7 @@
             "date":"08FEB24",
             "qty":50,
             "strikeDistance":50,
-            "straddleSpread":4
+            "straddleSpread":2.5
         },
         {
             "id":2,
@@ -14,7 +14,7 @@
             "date":"31JAN24",
             "qty":15,
             "strikeDistance":100,
-            "straddleSpread":9
+            "straddleSpread":5
         },
         {
             "id":3,
@@ -22,7 +22,7 @@
             "date":"6FEB24",
             "qty":40,
             "strikeDistance":50,
-            "straddleSpread":4
+            "straddleSpread":2.5
         },
         {
             "id":4,
@@ -30,7 +30,7 @@
             "date":"05FEB24",
             "qty":75,
             "strikeDistance":25,
-            "straddleSpread":2.5
+            "straddleSpread":1.2
         },
         {
             "id":5,
@@ -38,7 +38,7 @@
             "date":"SENSEX24209",
             "qty":10,
             "strikeDistance":100,
-            "straddleSpread":9
+            "straddleSpread":5
         }
     ]
 }

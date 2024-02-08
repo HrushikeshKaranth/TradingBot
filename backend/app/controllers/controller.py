@@ -117,6 +117,22 @@ def placeorder():
     print(ord1)
     print(ord2)
     return jsonify(ord1,ord2)
+
+def placeordersensex():
+    res = request.get_json()
+    print(res['ce'])
+    print(res['pe'])
+    ord1 = api.place_order(buy_or_sell='S', product_type='M',
+                            exchange='BFO', tradingsymbol=res['ce'], 
+                            quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                            retention='DAY', remarks='order1')
+    ord2 = api.place_order(buy_or_sell='S', product_type='M',
+                            exchange='BFO', tradingsymbol=res['pe'], 
+                            quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                            retention='DAY', remarks='order2')
+    print(ord1)
+    print(ord2)
+    return jsonify(ord1,ord2)
     # return jsonify('done')
 
 def exitorder():
@@ -208,6 +224,24 @@ def exitallorders():
             api.place_order(buy_or_sell='B', product_type='M', exchange='NFO', tradingsymbol=i.tysm,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None, retention='DAY', remarks='my_order_001')
         if int(i.netqty)>0: 
             api.place_order(buy_or_sell='S', product_type='M', exchange='NFO', tradingsymbol=i.tysm,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None,retention='DAY', remarks='my_order_002')
+    return jsonify(a)
+
+def exitallorderssensex():
+    # ret = api.get_order_book()
+    # ret = api.get_positions()
+    # print(ret[0]['tsym'])
+    # for i in range(len(ret)):
+    #     ord = api.place_order(buy_or_sell='S', product_type='M',
+    #                         exchange='NFO', tradingsymbol=ret[i]['tsym'], 
+    #                         quantity=ret[i]['daybuyqty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+    #                         retention='DAY', remarks='order2')
+    a=api.positions()
+    a=pd.DataFrame(a)
+    for i in a.itertuples():
+        if int(i.netqty)<0: 
+            api.place_order(buy_or_sell='B', product_type='M', exchange='BFO', tradingsymbol=i.tysm,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None, retention='DAY', remarks='my_order_001')
+        if int(i.netqty)>0: 
+            api.place_order(buy_or_sell='S', product_type='M', exchange='BFO', tradingsymbol=i.tysm,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None,retention='DAY', remarks='my_order_002')
     return jsonify(a)
 
 expiry = '01FEB24'
@@ -316,11 +350,31 @@ def enterordershort():
     print(ord)
     return jsonify(ord)
 
+def enterordershortsensex():
+    res = request.get_json()
+    print(res)
+    ord = api.place_order(buy_or_sell='B', product_type='M',
+                        exchange='BFO', tradingsymbol=res['pe'], 
+                        quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks='Buy')
+    print(ord)
+    return jsonify(ord)
+
 def enterorderlong():
     res = request.get_json()
     print(res)
     ord = api.place_order(buy_or_sell='B', product_type='M',
                         exchange='NFO', tradingsymbol=res['ce'], 
+                        quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks='Buy')
+    print(ord)
+    return jsonify(ord)
+
+def enterorderlongsensex():
+    res = request.get_json()
+    print(res)
+    ord = api.place_order(buy_or_sell='B', product_type='M',
+                        exchange='BFO', tradingsymbol=res['ce'], 
                         quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
                         retention='DAY', remarks='Buy')
     print(ord)
@@ -334,6 +388,18 @@ def closeshortgolong():
                         retention='DAY', remarks='Buy')
     ord2 = api.place_order(buy_or_sell='B', product_type='M',
                         exchange='NFO', tradingsymbol=res['buy'], 
+                        quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks='Buy')
+    return jsonify(ord1,ord2)
+
+def closeshortgolongsensex():
+    res = request.get_json()
+    ord1 = api.place_order(buy_or_sell='S', product_type='M',
+                        exchange='BFO', tradingsymbol=res['sell'], 
+                        quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks='Buy')
+    ord2 = api.place_order(buy_or_sell='B', product_type='M',
+                        exchange='BFO', tradingsymbol=res['buy'], 
                         quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
                         retention='DAY', remarks='Buy')
     return jsonify(ord1,ord2)

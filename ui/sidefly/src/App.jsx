@@ -35,11 +35,11 @@ function App() {
       <div className="sub">
         <Login />
       </div>
-      {/* <div className="sub">
-        <Sidefly />
-      </div> */}
       <div className="sub">
-        <SideflySensex />
+        <Sidefly />
+      </div>
+      <div className="sub">
+        {/* <SideflySensex /> */}
       </div>
     </div>
   );

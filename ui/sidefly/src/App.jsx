@@ -4,6 +4,7 @@ import "./Style/Style.css";
 import axios from './Helpers/Axios'
 import Sidefly from "./Components/Sidefly";
 import SideflySensex from "./Components/SideflySensex";
+import Ulti from "./Components/Ulti";
 
 function App() {
 
@@ -36,10 +37,9 @@ function App() {
         <Login />
       </div>
       <div className="sub">
-        <Sidefly />
-      </div>
-      <div className="sub">
+        {/* <Sidefly /> */}
         {/* <SideflySensex /> */}
+        <Ulti/>
       </div>
     </div>
   );

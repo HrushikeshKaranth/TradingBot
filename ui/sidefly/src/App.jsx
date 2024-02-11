@@ -37,9 +37,9 @@ function App() {
         <Login />
       </div>
       <div className="sub">
-        {/* <Sidefly /> */}
+        <Sidefly />
         {/* <SideflySensex /> */}
-        <Ulti/>
+        {/* <Ulti/> */}
       </div>
     </div>
   );

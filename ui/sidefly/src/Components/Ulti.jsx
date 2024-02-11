@@ -112,23 +112,23 @@ function Ulti() {
         else{console.log('Monitoring...! [Order count - '+orderCount+']');}
     }, [check])
 
-    useEffect(()=>{
-        if(isOrderPlaced == true && price >= upStrike){
-            console.log('Price crossed upside, Entering new positions.');
-            stopCheck();
-            let exited = exitOrder();
-            if(exited == true){ placeOrder(); }
-            else{startCheck()}
-        }
-        else if(isOrderPlaced == true && price <= downStrike){
-            console.log('Price crossed downside, Entering new positions.');
-            stopCheck();
-            let exited = exitOrder();
-            if(exited == true){ placeOrder(); }
-            else{startCheck()}
-        }
-        // else{console.log('No new entry required!')}
-    },[check])
+    // useEffect(()=>{
+    //     if(isOrderPlaced == true && price >= upStrike){
+    //         console.log('Price crossed upside, Entering new positions.');
+    //         stopCheck();
+    //         let exited = exitOrder();
+    //         if(exited == true){ placeOrder(); }
+    //         else{startCheck()}
+    //     }
+    //     else if(isOrderPlaced == true && price <= downStrike){
+    //         console.log('Price crossed downside, Entering new positions.');
+    //         stopCheck();
+    //         let exited = exitOrder();
+    //         if(exited == true){ placeOrder(); }
+    //         else{startCheck()}
+    //     }
+    //     // else{console.log('No new entry required!')}
+    // },[check])
 
     function newEntriesRequiredCheck(){
         setCheck1(check1 = check1+1)

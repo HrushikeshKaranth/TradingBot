@@ -217,14 +217,14 @@ def exitallorders():
     #                         exchange='NFO', tradingsymbol=ret[i]['tsym'], 
     #                         quantity=ret[i]['daybuyqty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
     #                         retention='DAY', remarks='order2')
-    a=api.positions()
+    a=api.get_positions()
     a=pd.DataFrame(a)
     for i in a.itertuples():
         if int(i.netqty)<0: 
-            api.place_order(buy_or_sell='B', product_type='M', exchange='NFO', tradingsymbol=i.tysm,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None, retention='DAY', remarks='my_order_001')
+            api.place_order(buy_or_sell='B', product_type='M', exchange='NFO', tradingsymbol=i.tsym,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None, retention='DAY', remarks='my_order_001')
         if int(i.netqty)>0: 
-            api.place_order(buy_or_sell='S', product_type='M', exchange='NFO', tradingsymbol=i.tysm,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None,retention='DAY', remarks='my_order_002')
-    return jsonify(a)
+            api.place_order(buy_or_sell='S', product_type='M', exchange='NFO', tradingsymbol=i.tsym,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None,retention='DAY', remarks='my_order_002')
+    return jsonify('done')
 
 def exitallorderssensex():
     # ret = api.get_order_book()
@@ -235,14 +235,16 @@ def exitallorderssensex():
     #                         exchange='NFO', tradingsymbol=ret[i]['tsym'], 
     #                         quantity=ret[i]['daybuyqty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
     #                         retention='DAY', remarks='order2')
-    a=api.positions()
+    a=api.get_positions()
+    print(a)
     a=pd.DataFrame(a)
+    print(a)
     for i in a.itertuples():
         if int(i.netqty)<0: 
-            api.place_order(buy_or_sell='B', product_type='M', exchange='BFO', tradingsymbol=i.tysm,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None, retention='DAY', remarks='my_order_001')
+            api.place_order(buy_or_sell='B', product_type='M', exchange='BFO', tradingsymbol=i.tsym,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None, retention='DAY', remarks='my_order_001')
         if int(i.netqty)>0: 
-            api.place_order(buy_or_sell='S', product_type='M', exchange='BFO', tradingsymbol=i.tysm,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None,retention='DAY', remarks='my_order_002')
-    return jsonify(a)
+            api.place_order(buy_or_sell='S', product_type='M', exchange='BFO', tradingsymbol=i.tsym,  quantity=int(i.netqty), discloseqty=0,price_type='MKT', price=0, trigger_price=None,retention='DAY', remarks='my_order_002')
+    return jsonify('done')
 
 expiry = '01FEB24'
 enteredLong = False

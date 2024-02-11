@@ -66,7 +66,7 @@ function SideflySensex() {
     useEffect(()=>{
         if(localStorage.getItem("entryStrike") != null){
             setEntryStrike(localStorage.getItem("entryStrike"));
-            startFeed();
+            // startFeed();
         } 
         else setEntryStrike(0)
     },[])
@@ -247,7 +247,7 @@ function SideflySensex() {
 
     function exitOrder() {
         stopStraddle();
-        axios.post('/exitallorderssensex')
+        axios.get('/exitallorderssensex')
             .then((res) => {
                 console.log(res);
                 console.log('All order exited!');

@@ -200,9 +200,9 @@ function Sidefly() {
         axios.post('/closeshortgolong', { 'sell': index + expiry + 'P' + entryStrike, 'buy': index + expiry + 'C' + entryStrike, 'qty': qty })
             .then((res) => {
                 if (res.data[0].stat && res.data[1].stat == 'Ok') {
-                    startStraddle();
                     setIsDownStrikePlaced(false)
                     setIsUpStrikePlaced(true)
+                    startStraddle();
                     // console.log('Entered Strike - ' + upStrike);
                     // console.log('Exited Strike - ' + downStrike);
                     console.log('Sold - ' + entryStrike + ' PE');
@@ -224,12 +224,12 @@ function Sidefly() {
             axios.post('/closeshortgolong', { 'sell': index + expiry + 'C' + entryStrike, 'buy': index + expiry + 'P' + entryStrike, 'qty': qty })
             .then((res) => {
                 if (res.data[0].stat && res.data[1].stat == 'Ok') {
-                    startStraddle();
                     setIsDownStrikePlaced(true)
                     setIsUpStrikePlaced(false)
+                    startStraddle();
                     console.log('Sold - ' + entryStrike + ' CE');
                     console.log('Bought - ' + entryStrike +' PE');
-                    setOrderCount(orderCount= orderCount+1)
+                    setOrderCount(orderCount= orderCount+1);
                     // console.log('Order Count = ' + orderCount);
                 }
                 else {
@@ -255,9 +255,9 @@ function Sidefly() {
 
     function enterOrder() {
         stopStraddle();
-        // setUpStrike(Number(currentStrike)+Number(50))
+        // setUpStrike(Number(currentStrike)+Number(50));
         // console.log('Up strike - '+upStrike);
-        // SetDownStrike(Number(currentStrike)-Number(50))
+        // SetDownStrike(Number(currentStrike)-Number(50));
         // console.log('Down strike - '+downStrike);
         if (price < entryStrike) {
             // console.log('Entering Strike - ' + downStrike);

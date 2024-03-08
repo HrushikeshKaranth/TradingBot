@@ -208,6 +208,15 @@ def placeorderud():
                             quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
                             retention='DAY', remarks='order1')
     return jsonify(ord1)
+
+def placeorderudsensex():
+    res = request.get_json()
+    ord1 = api.place_order(buy_or_sell='S', product_type='M',
+                            exchange='BFO', tradingsymbol=res['opt'], 
+                            quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                            retention='DAY', remarks='order1')
+    return jsonify(ord1)
+
 def exitallorders():
     # ret = api.get_order_book()
     # ret = api.get_positions()
@@ -384,12 +393,12 @@ def enterorderlongsensex():
 
 def closeshortgolong():
     res = request.get_json()
-    ord1 = api.place_order(buy_or_sell='S', product_type='M',
-                        exchange='NFO', tradingsymbol=res['sell'], 
-                        quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
-                        retention='DAY', remarks='Buy')
     ord2 = api.place_order(buy_or_sell='B', product_type='M',
                         exchange='NFO', tradingsymbol=res['buy'], 
+                        quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
+                        retention='DAY', remarks='Buy')
+    ord1 = api.place_order(buy_or_sell='S', product_type='M',
+                        exchange='NFO', tradingsymbol=res['sell'], 
                         quantity=res['qty'], discloseqty=0,price_type='MKT', price=0, trigger_price=0,
                         retention='DAY', remarks='Buy')
     return jsonify(ord1,ord2)

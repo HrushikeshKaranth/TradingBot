@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from '../Helpers/Axios'
 import expiryDates from '../Utils/expiryDates.json'
 
-function Sidefly() {
+function SideflyManual() {
 
     let [expiryData, setExpryData] = useState(expiryDates.data)
     let [expiry, setExpiry] = useState('')
@@ -58,13 +58,13 @@ function Sidefly() {
     // console.log(entryStrike);
     // console.log(upStrike);
     // console.log(downStrike);
-    useEffect(()=>{
-        if(localStorage.getItem("entryStrike") != null){
-            setEntryStrike(localStorage.getItem("entryStrike"));
-            startFeed();
-        } 
-        else setEntryStrike(0)
-    },[])
+    // useEffect(()=>{
+    //     if(localStorage.getItem("entryStrike") != null){
+    //         setEntryStrike(localStorage.getItem("entryStrike"));
+    //         startFeed();
+    //     } 
+    //     else setEntryStrike(0)
+    // },[])
 
     function reloadCheck(){
         if(price < entryStrike){
@@ -172,7 +172,7 @@ function Sidefly() {
         // SetDownStrike(currentStrike - 50)
         // console.log('Strike - '+currentStrike + ' Up - '+ upStrike+ ' Down - '+ downStrike);
         // setEntryPrice(price)
-        axios.post('/placeorder', { 'ce': index + expiry + 'C' + upStrike, 'pe': index + expiry + 'P' + downStrike, 'qty': qty })
+        axios.post('/placeorder', { 'ce': index + expiry + 'C' + upStrike, 'pe': index + expiry + 'P' + downStrike, 'qty': qty*2 })
             .then((res) => {
                 if (res.data[0].stat && res.data[1].stat == 'Ok') {
                     // setEntryStrike(currentStrike)
@@ -194,7 +194,7 @@ function Sidefly() {
     }
 
     function placeUpStrike() {
-        stopStraddle();
+        // stopStraddle();
         // setUpStrike(currentStrike+50)
         // console.log('Entering strike - ' + upStrike);
         axios.post('/closeshortgolong', { 'sell': index + expiry + 'P' + entryStrike, 'buy': index + expiry + 'C' + entryStrike, 'qty': qty })
@@ -202,7 +202,7 @@ function Sidefly() {
                 if (res.data[0].stat && res.data[1].stat == 'Ok') {
                     setIsDownStrikePlaced(false)
                     setIsUpStrikePlaced(true)
-                    startStraddle();
+                    // startStraddle();
                     // console.log('Entered Strike - ' + upStrike);
                     // console.log('Exited Strike - ' + downStrike);
                     console.log('Sold - ' + entryStrike + ' PE');
@@ -218,7 +218,7 @@ function Sidefly() {
         }
         
         function placeDownStrike() {
-            stopStraddle()
+            // stopStraddle()
             // SetDownStrike(currentStrike-50)
             // console.log('Entering strike - ' + downStrike);
             axios.post('/closeshortgolong', { 'sell': index + expiry + 'C' + entryStrike, 'buy': index + expiry + 'P' + entryStrike, 'qty': qty })
@@ -226,7 +226,7 @@ function Sidefly() {
                 if (res.data[0].stat && res.data[1].stat == 'Ok') {
                     setIsDownStrikePlaced(true)
                     setIsUpStrikePlaced(false)
-                    startStraddle();
+                    // startStraddle();
                     console.log('Sold - ' + entryStrike + ' CE');
                     console.log('Bought - ' + entryStrike +' PE');
                     setOrderCount(orderCount= orderCount+1);
@@ -255,7 +255,7 @@ function Sidefly() {
     }
 
     function enterOrder() {
-        stopStraddle();
+        // stopStraddle();
         // setUpStrike(Number(currentStrike)+Number(50));
         // console.log('Up strike - '+upStrike);
         // SetDownStrike(Number(currentStrike)-Number(50));
@@ -269,7 +269,7 @@ function Sidefly() {
                         console.log('PUT entered at ' + entryStrike);
                         setIsOrderPlaced(true)
                         setIsDownStrikePlaced(true)
-                        startStraddle();
+                        // startStraddle();
                     }
                     else {
                         alert('order exiting error❗❌');
@@ -288,7 +288,7 @@ function Sidefly() {
                         console.log('CALL entered at ' + entryStrike);
                         setIsOrderPlaced(true)
                         setIsUpStrikePlaced(true)
-                        startStraddle();
+                        // startStraddle();
                     }
                     else {
                         alert('order exiting error❗❌');
@@ -303,7 +303,7 @@ function Sidefly() {
 
     return (
         <div className='priceFeedSec'>
-            {/* <>Sidefly</> */}
+            <>Manual</>
             <div className="sub_">
                 <div className="priceFeedSettings">
                     <button onClick={startFeed}>Start Feed</button>
@@ -341,9 +341,11 @@ function Sidefly() {
                 <button onClick={placeOrder}>Place</button>
                 <button onClick={exitOrder}>Exit</button>
                 {/* <button onClick={closeOrder}>Close</button> */}
-                <button onClick={startStraddle}>Start</button>
-                <button onClick={stopStraddle}>Stop</button>
+                {/* <button onClick={startStraddle}>Start</button> */}
+                {/* <button onClick={stopStraddle}>Stop</button> */}
                 <button onClick={reloadCheck}>Check</button>
+                <button onClick={placeUpStrike}>Long</button>
+                <button onClick={placeDownStrike}>Short</button>
 
                 {/* <button onClick={placeUpStrike}>Up Strike</button> */}
                 {/* <button onClick={placeDownStrike}>Down Strike</button> */}
@@ -351,4 +353,4 @@ function Sidefly() {
         </div>)
 }
 
-export default Sidefly
+export default SideflyManual

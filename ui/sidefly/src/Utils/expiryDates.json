@@ -3,7 +3,8 @@
         {   
             "id":1,
             "index":"NIFTY",
-            "date":"15FEB24",
+            "date":"22FEB24",
+            "nextDate":"29FEB24",
             "qty":50,
             "strikeDistance":50,
             "straddleSpread":2.5
@@ -11,7 +12,8 @@
         {
             "id":2,
             "index":"BANKNIFTY",
-            "date":"14FEB24",
+            "date":"21FEB24",
+            "nextDate":"29FEB24",
             "qty":15,
             "strikeDistance":100,
             "straddleSpread":5
@@ -20,6 +22,7 @@
             "id":3,
             "index":"FINNIFTY",
             "date":"13FEB24",
+            "nextDate":"20FEB24",
             "qty":40,
             "strikeDistance":50,
             "straddleSpread":2.5
@@ -27,7 +30,8 @@
         {
             "id":4,
             "index":"MIDCPNIFTY",
-            "date":"12FEB24",
+            "date":"19FEB24",
+            "nextDate":"26FEB24",
             "qty":75,
             "strikeDistance":25,
             "straddleSpread":1.2
@@ -35,7 +39,8 @@
         {
             "id":5,
             "index":"SENSEX",
-            "date":"SENSEX24209",
+            "date":"SENSEX24223",
+            "nextDate":"SENSEX24301",
             "qty":10,
             "strikeDistance":100,
             "straddleSpread":5

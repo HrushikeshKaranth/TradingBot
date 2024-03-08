@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react'
 import axios from '../Helpers/Axios'
 import expiryDates from '../Utils/expiryDates.json'
 
-function Sidefly() {
+
+function DoubleLots() {
 
     let [expiryData, setExpryData] = useState(expiryDates.data)
     let [expiry, setExpiry] = useState('')
@@ -61,7 +62,7 @@ function Sidefly() {
     useEffect(()=>{
         if(localStorage.getItem("entryStrike") != null){
             setEntryStrike(localStorage.getItem("entryStrike"));
-            startFeed();
+            // startFeed();
         } 
         else setEntryStrike(0)
     },[])
@@ -172,7 +173,7 @@ function Sidefly() {
         // SetDownStrike(currentStrike - 50)
         // console.log('Strike - '+currentStrike + ' Up - '+ upStrike+ ' Down - '+ downStrike);
         // setEntryPrice(price)
-        axios.post('/placeorder', { 'ce': index + expiry + 'C' + upStrike, 'pe': index + expiry + 'P' + downStrike, 'qty': qty })
+        axios.post('/placeorder', { 'ce': index + expiry + 'C' + currentStrike, 'pe': index + expiry + 'P' + currentStrike, 'qty': qty })
             .then((res) => {
                 if (res.data[0].stat && res.data[1].stat == 'Ok') {
                     // setEntryStrike(currentStrike)
@@ -255,14 +256,14 @@ function Sidefly() {
     }
 
     function enterOrder() {
-        stopStraddle();
+        // stopStraddle();
         // setUpStrike(Number(currentStrike)+Number(50));
         // console.log('Up strike - '+upStrike);
         // SetDownStrike(Number(currentStrike)-Number(50));
         // console.log('Down strike - '+downStrike);
         if (price < entryStrike) {
             // console.log('Entering Strike - ' + downStrike);
-            axios.post('/enterordershort', { 'pe': index + expiry + 'P' + entryStrike, 'qty': qty })
+            axios.post('/placeorderud', { 'opt': index + expiry + 'C' + entryStrike, 'qty': qty })
                 .then((res) => {
                     // console.log(res);
                     if (res.data.stat == 'Ok') {
@@ -281,7 +282,7 @@ function Sidefly() {
         }
         else if (price > entryStrike) {
             // console.log('Entering Strike - ' + upStrike);
-            axios.post('/enterorderlong', { 'ce': index + expiry + 'C' + entryStrike, 'qty': qty })
+            axios.post('/placeorderud', { 'opt': index + expiry + 'P' + entryStrike, 'qty': qty })
                 .then((res) => {
                     // console.log(res);
                     if (res.data.stat == 'Ok') {
@@ -303,7 +304,7 @@ function Sidefly() {
 
     return (
         <div className='priceFeedSec'>
-            {/* <>Sidefly</> */}
+            <>Double Lots</>
             <div className="sub_">
                 <div className="priceFeedSettings">
                     <button onClick={startFeed}>Start Feed</button>
@@ -351,4 +352,4 @@ function Sidefly() {
         </div>)
 }
 
-export default Sidefly
+export default DoubleLots

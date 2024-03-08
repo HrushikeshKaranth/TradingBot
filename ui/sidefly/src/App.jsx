@@ -5,6 +5,9 @@ import axios from './Helpers/Axios'
 import Sidefly from "./Components/Sidefly";
 import SideflySensex from "./Components/SideflySensex";
 import Ulti from "./Components/Ulti";
+import SideflyManual from "./Components/SideflyManual";
+import DoubleLots from "./Components/DoubleLots";
+import OneSide from "./Components/OneSide";
 
 function App() {
 
@@ -37,9 +40,12 @@ function App() {
         <Login />
       </div>
       <div className="sub">
-        <Sidefly />
+        {/* <Sidefly /> */}
         {/* <SideflySensex /> */}
         {/* <Ulti/> */}
+        {/* <SideflyManual /> */}
+        {/* <DoubleLots /> */}
+        <OneSide />
       </div>
     </div>
   );

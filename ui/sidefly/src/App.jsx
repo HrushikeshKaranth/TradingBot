@@ -8,6 +8,7 @@ import Ulti from "./Components/Ulti";
 import SideflyManual from "./Components/SideflyManual";
 import DoubleLots from "./Components/DoubleLots";
 import OneSide from "./Components/OneSide";
+import AutoSupRes from "./Components/AutoSupRes";
 
 function App() {
 
@@ -16,7 +17,7 @@ function App() {
       axios.post('/setsession', {"usertoken":localStorage.getItem("userToken")})
         .then((res) => {
           if(res.status === 200){
-            console.log(res);
+            // console.log(res);
             console.log('session restarted');
           }
           else console.log('Error loggging in!');
@@ -45,7 +46,8 @@ function App() {
         {/* <Ulti/> */}
         {/* <SideflyManual /> */}
         {/* <DoubleLots /> */}
-        <OneSide />
+        {/* <OneSide /> */}
+        <AutoSupRes/>
       </div>
     </div>
   );

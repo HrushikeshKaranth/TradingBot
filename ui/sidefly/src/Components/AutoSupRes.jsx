@@ -13,7 +13,7 @@ function AutoSupRes() {
     let [entryStrike, setEntryStrike] = useState('')
     let [currentStrike, setCurrentStrike] = useState(0)
     let [strikeDistance, setStrikeDistance] = useState(0)
-    let [priceFeedLink, setPriceFeedLink] = useState('/pricefeednifty')
+    let [priceFeedLink, setPriceFeedLink] = useState('')
     let [qty, setQty] = useState(0)
     let [check, setCheck] = useState(0)
     let [checkIntId, setCheckIntId] = useState(null)
@@ -22,8 +22,8 @@ function AutoSupRes() {
     let [res, setRes] = useState(0)
     let [resStrike, setResStrike] = useState(0)
     let [supStrike, setSupStrike] = useState(0)
-    let [checkMsgSup, setCheckMsgSup] = useState('Stopped')
-    let [checkMsgRes, setCheckMsgRes] = useState('Stopped')
+    let [checkMsgSup, setCheckMsgSup] = useState('')
+    let [checkMsgRes, setCheckMsgRes] = useState('')
     let [isSupPlaced, setIsSupPlaced] = useState(false)
     let [isResPlaced, setIsResPlaced] = useState(false)
     let [checkSup, setCheckSup] = useState(false)
@@ -125,6 +125,9 @@ function AutoSupRes() {
             stopCheck();
             enterOrderRes()
         }
+        else{
+            console.log('Checking!');
+        }
     }, [check])
     // -----
 
@@ -150,7 +153,7 @@ function AutoSupRes() {
         axios.post('/enterorderlong', { 'ce': index + expiry + 'P' + supStrike, 'qty': qty })
             .then((res) => {
                 if (res.data.stat == 'Ok') {
-                    console.log('Support entered!');
+                    console.log('Support exited!');
                     setIsSupPlaced(false);
                     startCheck();
                     setOrderCount(orderCount = orderCount + 1)
@@ -167,6 +170,7 @@ function AutoSupRes() {
         axios.post('/placeorderud', { 'opt': index + expiry + 'C' + resStrike, 'qty': qty })
             .then((res) => {
                 if (res.data.stat == 'Ok') {
+                    console.log('Resistance entered!');
                     setIsResPlaced(true);
                     startCheck();
                     setOrderCount(orderCount = orderCount + 1)
@@ -183,6 +187,7 @@ function AutoSupRes() {
         axios.post('/enterorderlong', { 'ce': index + expiry + 'C' + resStrike, 'qty': qty })
             .then((res) => {
                 if (res.data.stat == 'Ok') {
+                    console.log('Resistance exited!');
                     setIsResPlaced(false);
                     startCheck();
                     setOrderCount(orderCount = orderCount + 1)
@@ -195,12 +200,36 @@ function AutoSupRes() {
                 console.log(err);
             })
     }
+
+    function placeOrder() {
+        axios.post('/placeorder', { 'ce': index + expiry + 'C' + resStrike, 'pe': index + expiry + 'P' + supStrike, 'qty': qty })
+            .then((res) => {
+                if (res.data[0].stat == 'Ok' && res.data[1].stat == 'Ok') {
+                    console.log('Trades entered!');
+                    setCheckSup(true);
+                    setCheckRes(true);
+                    setIsResPlaced(true);
+                    setIsSupPlaced(true);
+                    startCheck();
+                    setOrderCount(orderCount = orderCount + 2);
+                }
+                else {
+                    alert('Order placing error❗❌')
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }
+
     function exitOrder() {
         stopCheck();
         axios.post('/exitallorders')
             .then((res) => {
                 // console.log(res);
                 console.log('All orders exited!');
+                setCheckRes(false);
+                setCheckSup(false);
                 return true;
             })
             .catch((err) => {
@@ -208,6 +237,31 @@ function AutoSupRes() {
                 console.log(err);
                 return false;
             })
+    }
+
+    function holdStrat() {
+        setCheckRes(false);
+        setCheckSup(false);
+    }
+    function ResumeStrat() {
+        setCheckRes(true);
+        setCheckSup(true);
+    }
+    function resetStrat() {
+        stopCheck();
+        setCheckSup(true);
+        setCheckRes(true);
+        setIsResPlaced(true);
+        setIsSupPlaced(true);
+        setRes(localStorage.getItem("res"))
+        setResStrike(localStorage.getItem("resStrike"))
+        setSup(localStorage.getItem("sup"))
+        setSupStrike(localStorage.getItem("supStrike"))
+        // setIndex(localStorage.getItem("index"))
+        // setExpiry(localStorage.getItem("expiry"))
+        // setPriceFeedLink(localStorage.getItem("feedLink"));
+        // startFeed();
+        // startCheck();
     }
     // ----
 
@@ -223,8 +277,8 @@ function AutoSupRes() {
 
     function stopCheck() {
         clearInterval(checkIntId);
-        setCheckRes(false);
-        setCheckSup(false);
+        // setCheckRes(false);
+        // setCheckSup(false);
     }
 
     function startFeed() {
@@ -250,14 +304,15 @@ function AutoSupRes() {
     // -----
 
     // Use effects 
-    useEffect(() => {
-        setCurrentStrike(Math.round(price / strikeDistance) * strikeDistance)
-    }, [price, entryStrike])
+    // useEffect(() => {
+    //     setCurrentStrike(Math.round(price / strikeDistance) * strikeDistance)
+    // }, [price, entryStrike])
 
     useEffect(() => {
         checkSup == true ? setCheckMsgSup('Checking') : setCheckMsgSup('Stopped')
         checkRes == true ? setCheckMsgRes('Checking') : setCheckMsgRes('Stopped')
-    }, [checkSup, checkRes])
+        localStorage.setItem("orderCount", orderCount);
+    }, [checkSup, checkRes, check, orderCount])
     // -----
 
 
@@ -376,11 +431,12 @@ function AutoSupRes() {
                     <select name="Select Index"
                         onChange={(e) => {
                             setIndex(e.target.value);
-                            if (e.target.value == 'NIFTY') { setExpiry(expiryData[0].date); setQty(expiryData[0].qty); setPriceFeedLink('/pricefeednifty'); setStrikeDistance(expiryData[0].strikeDistance); setStraddleSpread(expiryData[0].straddleSpread) }
-                            else if (e.target.value == 'BANKNIFTY') { setExpiry(expiryData[1].date); setQty(expiryData[1].qty); setPriceFeedLink('/pricefeedbanknifty'); setStrikeDistance(expiryData[1].strikeDistance); setStraddleSpread(expiryData[1].straddleSpread) }
-                            else if (e.target.value == 'FINNIFTY') { setExpiry(expiryData[2].date); setQty(expiryData[2].qty); setPriceFeedLink('/pricefeedfinnifty'); setStrikeDistance(expiryData[2].strikeDistance); setStraddleSpread(expiryData[2].straddleSpread) }
-                            else if (e.target.value == 'MIDCPNIFTY') { setExpiry(expiryData[3].date); setQty(expiryData[3].qty); setPriceFeedLink('/pricefeedmidcap'); setStrikeDistance(expiryData[3].strikeDistance); setStraddleSpread(expiryData[3].straddleSpread) }
-                            else { setExpiry(expiryData[4].date); setQty(expiryData[4].qty); setPriceFeedLink('/pricefeedsensex'); setStrikeDistance(expiryData[4].strikeDistance); setStraddleSpread(expiryData[4].straddleSpread) }
+                            localStorage.setItem("index",e.target.value);
+                            if (e.target.value == 'NIFTY') { setExpiry(expiryData[0].date); localStorage.setItem("expiry",expiryData[0].date); setQty(expiryData[0].qty); setPriceFeedLink('/pricefeednifty');localStorage.setItem("feedLink","/pricefeednifty"); setStrikeDistance(expiryData[0].strikeDistance); setStraddleSpread(expiryData[0].straddleSpread) }
+                            else if (e.target.value == 'BANKNIFTY') { setExpiry(expiryData[1].date); localStorage.setItem("expiry",expiryData[1].date); setQty(expiryData[1].qty); setPriceFeedLink('/pricefeedbanknifty'); localStorage.setItem("feedLink","/pricefeedbanknifty"); setStrikeDistance(expiryData[1].strikeDistance); setStraddleSpread(expiryData[1].straddleSpread) }
+                            else if (e.target.value == 'FINNIFTY') { setExpiry(expiryData[2].date); localStorage.setItem("expiry",expiryData[2].date); setQty(expiryData[2].qty); setPriceFeedLink('/pricefeedfinnifty'); localStorage.setItem("feedLink","/pricefeedfinnifty"); setStrikeDistance(expiryData[2].strikeDistance); setStraddleSpread(expiryData[2].straddleSpread) }
+                            else if (e.target.value == 'MIDCPNIFTY') { setExpiry(expiryData[3].date); localStorage.setItem("expiry",expiryData[3].date); setQty(expiryData[3].qty); setPriceFeedLink('/pricefeedmidcap'); localStorage.setItem("feedLink","/pricefeedmidcap"); setStrikeDistance(expiryData[3].strikeDistance); setStraddleSpread(expiryData[3].straddleSpread) }
+                            else { setExpiry(expiryData[4].date); localStorage.setItem("expiry",expiryData[4].date); setQty(expiryData[4].qty); setPriceFeedLink('/pricefeedsensex'); localStorage.setItem("feedLink","/pricefeedsensex"); setStrikeDistance(expiryData[4].strikeDistance); setStraddleSpread(expiryData[4].straddleSpread) }
                         }}>
                         <option name="Select Index" selected disabled hidden >Index</option>
                         <option value="NIFTY">Nifty 50</option>
@@ -390,33 +446,37 @@ function AutoSupRes() {
                         {/* <option value="SENSEX">Sensex</option> */}
                     </select>
                     <span>Expiry: {expiry}</span>
+                    <span>Order count: {orderCount}</span>
                 </div>
             </div>
             <div className='sub_'>
                 <div className="sub">
                     <span>{index}: {price}</span>
-                    <span>Current Strike: {currentStrike}</span>
+                    {/* <span>Current Strike: {currentStrike}</span> */}
                     <span>
-                        Sup: <input type="text" onChange={(e) => { setSup(e.target.value) }} /> &emsp;
-                        Sup-Strike: <input type="text" onChange={(e) => { setSupStrike(e.target.value) }} /> &emsp;
-                        <button onClick={() => { setCheckSup(true) }}>Check</button> &emsp;
-                        <button onClick={() => { setCheckSup(false) }}>Stop</button> &emsp;
-                        <span>[{checkMsgSup}]</span>
-                    </span>
-                    <span>
-                        Res: <input type="text" onChange={(e) => { setRes(e.target.value) }} /> &emsp;
-                        Res-Strike: <input type="text" onChange={(e) => { setSupStrike(e.target.value) }} /> &emsp;
+                        Res: <input type="text" value={res} onChange={(e) => { setRes(e.target.value);localStorage.setItem("res", e.target.value); }} /> &emsp;
+                        Res-Strike: <input type="text" value={resStrike} onChange={(e) => { setResStrike(e.target.value);localStorage.setItem("resStrike", e.target.value); }} /> &emsp;
                         <button onClick={() => { setCheckRes(true) }}>Check</button> &emsp;
                         <button onClick={() => { setCheckRes(false) }}>Stop</button> &emsp;
                         <span>[{checkMsgRes}]</span>
+                    </span>
+                    <span>
+                        Sup: <input type="text" value={sup} onChange={(e) => { setSup(e.target.value);localStorage.setItem("sup", e.target.value); }} /> &emsp;
+                        Sup-Strike: <input type="text" value={supStrike} onChange={(e) => { setSupStrike(e.target.value);localStorage.setItem("supStrike", e.target.value); }} /> &emsp;
+                        <button onClick={() => { setCheckSup(true) }}>Check</button> &emsp;
+                        <button onClick={() => { setCheckSup(false) }}>Stop</button> &emsp;
+                        <span>[{checkMsgSup}]</span>
                     </span>
                 </div>
             </div>
             <div className="sub_">
                 <button onClick={startCheck}>Start</button>
                 <button onClick={stopCheck}>Stop</button>
+                <button onClick={holdStrat}>Hold</button>
+                <button onClick={ResumeStrat}>Resume</button>
+                <button onClick={placeOrder}>Place</button>
                 <button onClick={exitOrder}>Exit</button>
-
+                <button onClick={resetStrat}>Reset</button>
             </div>
         </div>)
 }

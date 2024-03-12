@@ -107,23 +107,35 @@ function AutoSupRes() {
     // Trade Conditions checking use effects
     useEffect(() => {
         if (checkSup == true && isSupPlaced == true && price < sup) {
-            stopCheck();
-            exitOrderSup();
+            if(sup - price > StraddleSpread){
+                stopCheck();
+                exitOrderSup();
+            }
+            else{console.log('Checking outside support!');}
         }
         else if (checkSup == true && isSupPlaced == false && price > sup) {
-            stopCheck();
-            enterOrderSup();
+            if(price - sup > StraddleSpread){
+                stopCheck();
+                enterOrderSup();
+            }
+            else{console.log('Checking inside support!');}
         }
     }, [check])
-
+    
     useEffect(() => {
         if (checkRes == true && isResPlaced == true && price > res) {
-            stopCheck();
-            exitOrderRes();
+            if(price - res > StraddleSpread){
+                stopCheck();
+                exitOrderRes();
+            }
+            else{console.log('Checking outside resistance!');}
         }
         else if (checkRes == true && isResPlaced == false && price < res) {
-            stopCheck();
-            enterOrderRes()
+            if(res - price > StraddleSpread){
+                stopCheck();
+                enterOrderRes();
+            }
+            else{console.log('Checking inside resistance!');}
         }
         else{
             console.log('Checking!');
@@ -136,7 +148,7 @@ function AutoSupRes() {
         axios.post('/placeorderud', { 'opt': index + expiry + 'P' + supStrike, 'qty': qty })
             .then((res) => {
                 if (res.data.stat == 'Ok') {
-                    console.log('Support entered!');
+                    console.log('Support entered at - '+ price);
                     setIsSupPlaced(true);
                     startCheck();
                     setOrderCount(orderCount = orderCount + 1)
@@ -153,7 +165,7 @@ function AutoSupRes() {
         axios.post('/enterorderlong', { 'ce': index + expiry + 'P' + supStrike, 'qty': qty })
             .then((res) => {
                 if (res.data.stat == 'Ok') {
-                    console.log('Support exited!');
+                    console.log('Support exited at '+ price);
                     setIsSupPlaced(false);
                     startCheck();
                     setOrderCount(orderCount = orderCount + 1)
@@ -170,7 +182,7 @@ function AutoSupRes() {
         axios.post('/placeorderud', { 'opt': index + expiry + 'C' + resStrike, 'qty': qty })
             .then((res) => {
                 if (res.data.stat == 'Ok') {
-                    console.log('Resistance entered!');
+                    console.log('Resistance entered at '+ price);
                     setIsResPlaced(true);
                     startCheck();
                     setOrderCount(orderCount = orderCount + 1)
@@ -187,7 +199,7 @@ function AutoSupRes() {
         axios.post('/enterorderlong', { 'ce': index + expiry + 'C' + resStrike, 'qty': qty })
             .then((res) => {
                 if (res.data.stat == 'Ok') {
-                    console.log('Resistance exited!');
+                    console.log('Resistance exited at '+ price);
                     setIsResPlaced(false);
                     startCheck();
                     setOrderCount(orderCount = orderCount + 1)

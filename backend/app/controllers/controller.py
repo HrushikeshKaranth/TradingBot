@@ -15,10 +15,10 @@ def login():
 
     # credentials
     user = 'FA196478'
-    pwd = 'Hrushi@476'
+    pwd = 'Hrushi@47'
     factor2 = 'TGZZ6WQUA723WS57SI65Z66SC6Q36635'
     vc = 'FA196478_U'
-    apikey = '0d2eb21c0ff1ab424f4233a3cb82aab5'
+    apikey = '51c024873423d56ad9e39207f8c470aa'
     imei = 'abc1234'
 
     # with open('cred.yml') as f:
@@ -30,7 +30,7 @@ def login():
     ret = api.login(userid=user, password=pwd, twoFA=otp,
                     vendor_code=vc, api_secret=apikey, imei=imei)
 
-    # print(ret)
+    print(ret)
     # ret = api.get_security_info(exchange='NSE', token='26000')
 
     print('Logged in - '+ret['uname'])
@@ -40,7 +40,7 @@ def login():
 def setsession():
     res = request.get_json()
     user = 'FA196478'
-    pwd = 'Hrushi@476'
+    pwd = 'Hrushi@47'
     token = res['usertoken']
     ret = api.set_session(userid=user, password=pwd, usertoken=token)
     return jsonify(ret)

@@ -9,6 +9,7 @@ import SideflyManual from "./Components/SideflyManual";
 import DoubleLots from "./Components/DoubleLots";
 import OneSide from "./Components/OneSide";
 import AutoSupRes from "./Components/AutoSupRes";
+import DoubleFlys from "./Components/DoubleFlys";
 
 function App() {
 
@@ -47,7 +48,8 @@ function App() {
         {/* <SideflyManual /> */}
         {/* <DoubleLots /> */}
         {/* <OneSide /> */}
-        <AutoSupRes/>
+        {/* <AutoSupRes/> */}
+        <DoubleFlys/>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 from flask import Blueprint
 from app.controllers.controller import login, logout, pricefeednifty, pricefeedmidcap, pricefeedfinnifty, pricefeedbanknifty, placeorder, exitorder, pricestream,setsession,placescalporderce,placescalporderpe,placescalporderlong,placescalpordershort,scalping,exitallorders,pricefeedsensex,getoptiontoken,getoptionfeed,placeorderud,closeshortgolong,enterorderlong,enterordershort,placeordersensex,closeshortgolongsensex,exitallorderssensex,enterordershortsensex,enterorderlongsensex
 from app.controllers.scalpingController import placeorderoptb,placeorderopts,golongopt,goshortopt
+from app.controllers.doubleFlyController import df_placeorder_buy,df_placeorder_sell,getPositions
 # Creating routes Blueprint
 routes = Blueprint('routes', __name__)
 # -----
@@ -38,3 +39,7 @@ routes.route('/enterorderlong', methods=['POST'])(enterorderlong)
 routes.route('/enterorderlongsensex', methods=['POST'])(enterorderlongsensex)
 routes.route('/enterordershort', methods=['POST'])(enterordershort)
 routes.route('/enterordershortsensex', methods=['POST'])(enterordershortsensex)
+routes.route('/df_placeorder_sell', methods=['POST'])(df_placeorder_sell)
+routes.route('/df_placeorder_buy', methods=['POST'])(df_placeorder_buy)
+routes.route('/getpositions', methods=['GET'])(getPositions)
+

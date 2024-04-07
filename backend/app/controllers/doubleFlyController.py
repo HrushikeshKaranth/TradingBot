@@ -39,6 +39,7 @@ def df_placeorder_buy():
 
 def getPositions():
     res = api.get_positions()
+    # print(res)
     mtm = 0
     pnl=0
     daymtm = 0
@@ -47,3 +48,4 @@ def getPositions():
         pnl += float(i['rpnl'])
         daymtm = mtm+pnl
     return jsonify(daymtm)
+    # return jsonify(res)

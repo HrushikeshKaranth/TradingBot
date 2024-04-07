@@ -56,7 +56,7 @@ function DoubleFlys() {
     }
 
     function startPosition() {
-        let positionIntervalId = setInterval(getPosition, 500)
+        let positionIntervalId = setInterval(getPosition, 300)
         setPositionInt(positionIntervalId);
         console.log('P&L Feed started ✔');
     }
@@ -88,13 +88,14 @@ function DoubleFlys() {
     function getPosition(){
         axios.get('/getpositions')
         .then((res)=>{
-            setPosition(res.data[0])
+            // console.log(res);
+            setPosition(res.data);
         })
         .catch((err)=>{console.error(err)})
     }
 
     useEffect(()=>{
-        if(price - entryStrike >50 || price - entryStrike <50){
+        if(price - entryStrike >strikeDistance || price - entryStrike <-strikeDistance){
             if(isOrderPlaced === true){
                 exitOrder();
                 placeOrder();
@@ -106,7 +107,7 @@ function DoubleFlys() {
     },[check])
 
     useEffect(()=>{
-        if(position => -999){
+        if(position <= -999){
             if(isOrderPlaced === true){
                 exitOrder();
                 prompt('StopLoss hit! 😩');
@@ -148,17 +149,17 @@ function DoubleFlys() {
 
     function exitOrder() {
         stopStraddle();
-        isOrderPlaced(false);
-        axios.post('/exitallorders')
+        setIsOrderPlaced(false);
+        axios.get('/exitallorders')
         .then((res) => {
-            localStorage.removeItem('entryStrike')
+            localStorage.removeItem('entryStrike');
             console.log(res);
             console.log('All order exited!');
-            isOrderPlaced(false);
+            setIsOrderPlaced(false);
         })
         .catch((err) => {
             console.log(err);
-            isOrderPlaced(true);
+            setIsOrderPlaced(true);
             })
     }
 
@@ -169,6 +170,8 @@ function DoubleFlys() {
                 <div className="priceFeedSettings">
                     <button onClick={startFeed}>Start Feed</button>
                     <button onClick={stopFeed}>Stop Feed</button>
+                    <button onClick={startPosition}>Start Position</button>
+                    <button onClick={stopPosition}>Stop Position</button>
                     <select name="Select Index"
                         onChange={(e) => {
                             setIndex(e.target.value);

@@ -1,0 +1,10 @@
+- create a strangle initially
+- if the price goes to lower strike then sell calls
+- if the price goes to higher strike then sell puts 
+- if the price keeps on going higher or lower, then we keep on selling respected options
+- after moving one side if the price comes back then exit the recent order and sell the same opposite option.
+Ex:
+    - price moved from 74700 to 74600 (down) so, we sold 74600 call
+    - then the price moved from 74600 to 74700 (up) reversed, now we exit the 74600 call and enter 74600 put.
+- we will keep on doing this until the end of the market.
+ 

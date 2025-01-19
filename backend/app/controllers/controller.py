@@ -15,10 +15,10 @@ def login():
 
     # credentials
     user = 'FA196478'
-    pwd = 'Hrushi@47'
-    factor2 = 'TGZZ6WQUA723WS57SI65Z66SC6Q36635'
+    pwd = 'Hrushi@476'
+    factor2 = '4BCO3OO6PEH4TO536PU577LEUM675ZNT'
     vc = 'FA196478_U'
-    apikey = '51c024873423d56ad9e39207f8c470aa'
+    apikey = '43dc77b5425619f557cdd58ee8f7bd3c'
     imei = 'abc1234'
 
     # with open('cred.yml') as f:
@@ -27,6 +27,7 @@ def login():
 
     # make the api call
     otp = pyotp.TOTP(factor2).now()
+    print(otp)
     ret = api.login(userid=user, password=pwd, twoFA=otp,
                     vendor_code=vc, api_secret=apikey, imei=imei)
 

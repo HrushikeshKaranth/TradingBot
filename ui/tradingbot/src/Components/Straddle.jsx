@@ -80,7 +80,7 @@ function Straddle() {
     function getPrice() {
         axios.get(priceFeedLink)
             .then((res) => {
-                // console.log(res.data['lp'])
+                console.log(res)
                 setPrice(res.data['lp'])
                 // setCurrentStrike(Math.round(res.data['lp'] / strikeDistance) * strikeDistance)
                 // setUpStrike(Math.round(res.data['lp'] / strikeDistance) * strikeDistance)

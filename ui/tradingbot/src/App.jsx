@@ -52,9 +52,9 @@ function App() {
       <div className="sub">
         <ScalpingOptions/>
       </div>
-      <div className="strat">
+      {/* <div className="strat">
         <Scalping/>
-      </div>
+      </div> */}
       </div>
       {/* Strategy section */}
     </div>
